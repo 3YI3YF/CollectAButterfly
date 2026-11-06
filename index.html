@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#e9f4e1">
+  <meta name="theme-color" content="#14261b">
   <title>Game 3 · Collect the Butterflies | 3 Years In, 3 Years Forward</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Marcellus&display=swap" rel="stylesheet">
   <style>
     :root {
       color-scheme: light;
@@ -718,19 +720,143 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
     }
+
+    /* ===== 3 YEARS IN, 3 YEARS FORWARD — dark forest + gold theme ===== */
+    :root {
+      color-scheme: dark;
+      --ink: #f6efd8; --sub: #b9c4a8; --forest: #d39a2c; --forest-dark: #f0d98a;
+      --leaf: #6cb48b; --line: rgba(233,196,106,.22); --gold: #e9c46a;
+      --shadow: 0 24px 60px rgba(0,0,0,.45); --radius: 26px;
+    }
+    body {
+      background:
+        radial-gradient(circle at 50% 0%, rgba(233,196,106,.10), transparent 40%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg fill='%23d9b45a' fill-opacity='.075' font-family='monospace' font-size='15'%3E%3Ctext x='8' y='24'%3E0 1 0 0 1 0%3C/text%3E%3Ctext x='96' y='70'%3E1 0 1 1 0%3C/text%3E%3Ctext x='20' y='118'%3E0 0 1 0 1 1%3C/text%3E%3Ctext x='130' y='160'%3E1 1 0 1 0%3C/text%3E%3Ctext x='40' y='206'%3E0 1 0 1 0 0%3C/text%3E%3Ctext x='150' y='246'%3E0 1 1 0%3C/text%3E%3C/g%3E%3C/svg%3E"),
+        linear-gradient(180deg, #17291c 0%, #1b3022 55%, #12211a 100%);
+      background-attachment: fixed;
+    }
+    .app { position: relative; z-index: 1; }
+    #botanicals { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .corner { position: fixed; width: clamp(170px, 30vw, 430px); height: auto; filter: drop-shadow(0 8px 14px rgba(0,0,0,.35)); }
+    .corner.tl { left: 0; top: 0; } .corner.tr { right: 0; top: 0; }
+    .corner.bl { left: 0; bottom: 0; } .corner.br { right: 0; bottom: 0; }
+
+    /* hero lockup */
+    .hero { display: grid; justify-items: center; text-align: center; gap: 8px; margin: 0 0 22px; }
+    .seal svg { width: clamp(64px, 8vw, 90px); height: auto; display: block; filter: drop-shadow(0 6px 14px rgba(0,0,0,.55)); }
+    .lockup { display: flex; align-items: center; gap: clamp(6px, 1.4vw, 16px); margin-top: 6px; }
+    .big3 { display: grid; font: 700 clamp(86px, 12vw, 148px)/.9 'Marcellus', Georgia, serif; }
+    .big3 span { grid-area: 1 / 1; }
+    .big3 .sh { color: #9a6a17; transform: translate(5px, 5px); }
+    .big3 .fg { background: linear-gradient(180deg, #ffd983, #e89c27); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .phrase { text-align: left; font: italic 500 clamp(34px, 5.2vw, 60px)/1.02 'Cormorant Garamond', Georgia, serif;
+      background: linear-gradient(90deg, #e3bd72, #f4e8c8); -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
+    .uptitle { font: 400 clamp(16px, 2.1vw, 24px)/1.25 'Marcellus', Georgia, serif; color: #f6efd8; margin-top: 6px; }
+    .dateline { font: 400 clamp(13px, 1.5vw, 17px) 'Marcellus', Georgia, serif; color: #e3b957; letter-spacing: .03em; }
+    .meta-row { justify-content: center; margin-top: 8px; }
+
+    .chip { background: rgba(255,255,255,.06); border-color: rgba(233,196,106,.35); color: #f0d98a; }
+    button.chip:hover { background: rgba(233,196,106,.16); }
+    .panel { background: rgba(12,26,17,.78); border-color: rgba(233,196,106,.26); backdrop-filter: blur(6px); }
+    .garden-panel { background: linear-gradient(180deg, rgba(24,46,32,.85), rgba(14,30,20,.9)); }
+    .game-panel { background: linear-gradient(180deg, rgba(16,34,23,.85), rgba(12,26,17,.9)); }
+    .eyebrow { color: var(--gold); }
+    .garden-header h1 { font: italic 600 clamp(32px, 4.6vw, 54px)/1 'Cormorant Garamond', Georgia, serif; letter-spacing: -.01em; color: #f1dc9b; }
+    .stack-card h2, .scenario { font-family: 'Cormorant Garamond', Georgia, serif; color: #f6efd8; font-weight: 600; letter-spacing: 0; }
+    .scenario { font-size: clamp(24px, 2.8vw, 32px); }
+    .collection-chip { background: rgba(233,196,106,.1); }
+
+    /* night garden scene */
+    .garden-scene { background:
+      radial-gradient(ellipse at 50% 0%, rgba(233,196,106,.2), transparent 55%),
+      radial-gradient(ellipse at 50% 100%, rgba(80,140,90,.25), transparent 60%),
+      linear-gradient(180deg, #112318 0%, #1a3323 58%, #244630 100%); }
+    .garden-scene::after { background: linear-gradient(180deg, #2c5235, #1b3a26); opacity: .95; }
+    .sun, .cloud { display: none; }
+    .scene-title { color: #e9c46a; font-family: 'Cormorant Garamond', Georgia, serif; text-shadow: 0 2px 6px rgba(0,0,0,.5); font-size: clamp(17px, 1.9vw, 24px); }
+    .soil-bed { background: linear-gradient(180deg, #4a3526 10%, #33241a 60%, #221710 100%); border: 3px solid #c9a24e;
+      box-shadow: inset 0 6px 0 rgba(233,196,106,.18), 0 8px 18px rgba(0,0,0,.4), 0 0 18px rgba(233,196,106,.12); }
+    .soil-bed::before { background: #1a110b; }
+    .plot-label { color: #f6e3a4; text-shadow: 0 1px 3px rgba(0,0,0,.9); font-family: 'Marcellus', Georgia, serif; }
+    .plant svg { filter: drop-shadow(0 0 8px rgba(255,244,200,.25)); }
+    .plant.bloomed svg { filter: drop-shadow(0 0 12px rgba(255,236,170,.55)); }
+    .flier { filter: drop-shadow(0 0 10px rgba(255,226,140,.45)); }
+    .firefly { position: absolute; left: var(--x); top: var(--y); width: 6px; height: 6px; border-radius: 50%; background: #ffe9a8; z-index: 2;
+      box-shadow: 0 0 12px 4px rgba(255,220,130,.55); animation: drift var(--d) ease-in-out infinite alternate, glow 2.4s ease-in-out infinite alternate; pointer-events: none; }
+    @keyframes drift { from { transform: translate(-22px, 10px); } to { transform: translate(26px, -22px); } }
+    @keyframes glow { from { opacity: .25; } to { opacity: 1; } }
+
+    .legend { background: rgba(6,16,10,.55); border-top-color: rgba(233,196,106,.2); }
+    .legend-item { background: rgba(255,255,255,.05); border-color: rgba(233,196,106,.22); color: #d9d2b0; }
+    .legend-item .dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--skill-color) 28%, transparent); }
+    .legend-item.collected { color: #f0d98a; border-color: rgba(233,196,106,.6); background: rgba(233,196,106,.12); }
+
+    .mini-card, .stack-card { background: rgba(255,255,255,.05); border-color: rgba(233,196,106,.22); box-shadow: none; }
+    .stack-card { background: rgba(10,24,15,.7); }
+    .mini-card .label, .summary-box .label { color: #b9a96f; }
+    .timer-display { border-color: rgba(233,196,106,.45); }
+    .timer-display .time { color: var(--gold); }
+    .timer-display.warn .time { color: #f2b45a; } .timer-display.danger .time { color: #ff8a75; }
+    .field label { color: #d6c690; }
+    .field input, .field select { background: rgba(255,255,255,.06); border-color: rgba(233,196,106,.32); color: #f6efd8; }
+    .field input::placeholder { color: #8fa086; }
+    .field select option { background: #14261b; color: #f6efd8; }
+    .player-note, .selection-hint, .fine-print { color: #a9b99f; }
+    .instruction { color: #c8cfb6; }
+    .progress-top div[style] { color: #c9c19a !important; }
+    .round-pill { background: rgba(233,196,106,.14); color: #f0d98a; }
+    .progress-track { background: rgba(255,255,255,.12); }
+    .progress-fill { background: linear-gradient(90deg, #f4cf74, #d39a2c); }
+    .choice-group h3 { color: #efe6c8; }
+    .step { background: rgba(233,196,106,.18); color: #f0d98a; }
+    .option { background: rgba(255,255,255,.05); border-color: rgba(233,196,106,.28); color: #efe6c8; }
+    .option:hover:not(:disabled) { background: rgba(233,196,106,.12); border-color: var(--gold); }
+    .option[aria-pressed="true"] { background: rgba(233,196,106,.2); border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold), 0 0 14px rgba(233,196,106,.25); color: #ffe9a8; }
+    .option:disabled { opacity: .7; }
+    .action-bar { border-top-color: rgba(233,196,106,.18); }
+    .primary { background: linear-gradient(180deg, #f4cf74, #d39a2c); color: #1b2a1a; box-shadow: 0 10px 22px rgba(211,154,44,.28); }
+    .primary:disabled { background: rgba(255,255,255,.1); color: rgba(255,255,255,.35); }
+    .secondary { background: transparent; color: #f0d98a; border: 1px solid rgba(233,196,106,.5); }
+    .feedback { background: rgba(233,196,106,.08); border-color: rgba(233,196,106,.35); }
+    .feedback.wrong { background: rgba(214,120,90,.1); border-color: rgba(220,150,110,.45); }
+    .feedback-heading { color: #f0d98a; } .feedback.wrong .feedback-heading { color: #f0b48a; }
+    .feedback p { color: #d8d4bd; }
+    .pair, .feedback.wrong .pair { background: rgba(255,255,255,.07); border-color: rgba(233,196,106,.3); color: #f0d98a; }
+    .final-medallion { background: radial-gradient(circle, rgba(233,196,106,.28), rgba(233,196,106,.06)); }
+    .score-line { color: var(--gold); }
+    .summary-box { background: rgba(255,255,255,.05); border-color: rgba(233,196,106,.2); }
+    .summary-box strong { color: #f6efd8; }
+    @media (max-width: 720px) { .lockup { flex-direction: column; } .phrase { text-align: center; } }
+    .hero { margin-bottom: 18px; } .meta-row { margin-top: 0; }
+    .plant svg, .plant.bloomed svg { filter: none; }
+    .plant.bloomed svg { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--glow, #ffe9a8) 75%, transparent)); }
+    .flier.landed { filter: drop-shadow(0 0 16px color-mix(in srgb, var(--glow, #ffe28c) 80%, transparent)); }
+    .foot { text-align: center; margin: 34px 0 0; }
+    .foot-title { font: 400 clamp(24px, 3.2vw, 36px)/1.2 'Cormorant Garamond', Georgia, serif; color: #d9a53c; letter-spacing: .02em; }
+    .foot-sub { margin-top: 6px; font-size: 12px; color: #8d9a85; }
+    .hint-box { margin: 16px 0 0; padding: 12px 14px; border-radius: 14px; border: 1px dashed rgba(233,196,106,.55);
+      background: rgba(233,196,106,.09); color: #f3e7bd; font-size: 13.5px; line-height: 1.6; animation: hintIn .4s ease; }
+    .hint-box strong { color: var(--gold); }
+    @keyframes hintIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .option.eliminated { opacity: .28; text-decoration: line-through; cursor: not-allowed; }
+    #hint-btn { min-height: 48px; }
+    #hint-btn:disabled { opacity: .5; cursor: not-allowed; }
   </style>
 </head>
 <body>
+  <div id="botanicals" aria-hidden="true"></div>
   <main class="app">
-    <div class="topbar">
-      <div class="brand"><span class="brand-mark">🌱</span> 3 Years In, 3 Years Forward</div>
+    <header class="hero">
       <div class="meta-row">
         <div class="chip" id="player-chip">👤 Waiting for player details</div>
-        <div class="chip">🌼 Five flowers to bloom</div>
+        <div class="chip">🌸 Five flowers to bloom</div>
+        <button type="button" class="chip" id="sound-btn" aria-pressed="true">🔊 Sound on</button>
       </div>
-    </div>
+    </header>
 
-    <div class="workspace">
+    
+<div class="workspace">
       <section class="panel garden-panel" aria-label="Garden design and butterfly collection scene">
         <div class="garden-header">
           <div>
@@ -821,8 +947,10 @@
               <div class="option-wrap" id="soft-options" role="group" aria-label="Soft skills"></div>
             </section>
           </div>
+          <div class="hint-box" id="hint-box" hidden aria-live="polite"></div>
           <div class="action-bar" id="action-bar">
             <span class="selection-hint" id="selection-hint" aria-live="polite">Select a Dx skill and a soft skill.</span>
+            <button type="button" class="secondary" id="hint-btn">💡 Hint</button>
             <button type="button" class="primary" id="submit-btn" disabled>Check my pair ↗</button>
           </div>
           <div class="feedback" id="feedback" role="status" aria-live="polite">
@@ -855,6 +983,7 @@
         </section>
       </aside>
     </div>
+    <footer class="foot"><div class="foot-title">Three Years In, Three Years Forward</div><div class="foot-sub">Office of the Vice President for Digital Transformation, University of the Philippines</div></footer>
   </main>
 
   <script>
@@ -870,11 +999,11 @@
         { name: 'Empathy', color: '#67c6a0', target: [82, 55], start: [89, 43], speed: '4s' },
       ],
       situations: [
-        { text: 'A simple request passes through many steps, and people aren’t sure where it is.', dx: 'Process', soft: 'Communication', lesson: 'Map the steps and make the status visible. Clear communication helps everyone understand where a request is and what happens next.' },
-        { text: 'Two units are solving the same problem separately, creating duplicate work.', dx: 'People', soft: 'Collaboration', lesson: 'Bring people together, clarify roles, and share progress. Collaboration reduces duplication and builds a shared solution.' },
-        { text: 'A new online platform is introduced, but employees hesitate to change their routines.', dx: 'Technology', soft: 'Adaptability', lesson: 'Introduce tools with practical support and room to learn. Adaptability helps people turn a new technology into a better habit.' },
-        { text: 'Different teams submit conflicting figures, making it hard to decide what to prioritize.', dx: 'Data', soft: 'Critical Thinking', lesson: 'Agree on reliable data definitions and question assumptions before drawing conclusions. Critical thinking makes evidence useful.' },
-        { text: 'Some users struggle to access a digital service because their needs were overlooked.', dx: 'Policy', soft: 'Empathy', lesson: 'Listen to people affected by a service and review the rules behind it. Empathy helps shape more inclusive digital policies.' },
+        { hint: 'Think about making the journey visible. Which skill is about telling people clearly where things stand?', text: 'A simple request passes through many steps, and people aren’t sure where it is.', dx: 'Process', soft: 'Communication', lesson: 'Map the steps and make the status visible. Clear communication helps everyone understand where a request is and what happens next.' },
+        { hint: 'Two groups, one problem. Which skill is about working side by side so effort isn’t duplicated?', text: 'Two units are solving the same problem separately, creating duplicate work.', dx: 'People', soft: 'Collaboration', lesson: 'Bring people together, clarify roles, and share progress. Collaboration reduces duplication and builds a shared solution.' },
+        { hint: 'A new tool only helps when people are willing to change their routines. Which skill is about adjusting to the new?', text: 'A new online platform is introduced, but employees hesitate to change their routines.', dx: 'Technology', soft: 'Adaptability', lesson: 'Introduce tools with practical support and room to learn. Adaptability helps people turn a new technology into a better habit.' },
+        { hint: 'The numbers disagree. Which skill is about questioning assumptions and weighing the evidence?', text: 'Different teams submit conflicting figures, making it hard to decide what to prioritize.', dx: 'Data', soft: 'Critical Thinking', lesson: 'Agree on reliable data definitions and question assumptions before drawing conclusions. Critical thinking makes evidence useful.' },
+        { hint: 'Someone was overlooked. Which skill is about understanding what users experience, and who is shaped by the rules?', text: 'Some users struggle to access a digital service because their needs were overlooked.', dx: 'Policy', soft: 'Empathy', lesson: 'Listen to people affected by a service and review the rules behind it. Empathy helps shape more inclusive digital policies.' },
       ],
       timeLimitSeconds: 180,
     };
@@ -893,6 +1022,7 @@
     let timerId = null;
     let gameStarted = false;
     let completedSituations = 0;
+    let hintLevel = 0;
 
     function escapeHTML(str) {
       return String(str).replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
@@ -937,30 +1067,6 @@
       </svg>`;
     }
 
-    function plantMarkup() {
-      return `
-        <svg viewBox="0 0 120 190" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="petalGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#ffffff"/>
-              <stop offset=".5" stop-color="#fffef2"/>
-              <stop offset="1" stop-color="#edf0df"/>
-            </linearGradient>
-          </defs>
-          <path d="M60 160 C55 126 56 100 60 68" fill="none" stroke="#417b52" stroke-width="6" stroke-linecap="round"/>
-          <path d="M59 130 Q31 101 20 115 Q37 139 58 138Z" fill="#78b780" stroke="#4a8b62" stroke-width="1.6"/>
-          <path d="M60 118 Q85 98 98 109 Q83 132 60 129Z" fill="#90c98c" stroke="#55966a" stroke-width="1.6"/>
-          <g class="closed-bud">
-            <path d="M60 67 C44 53 47 24 60 9 C75 22 76 52 60 67Z" fill="#e7efb9" stroke="#6f9b6e" stroke-width="2"/>
-            <path d="M60 63 Q55 39 60 18" fill="none" stroke="#b3cf8c" stroke-width="3" stroke-linecap="round"/>
-          </g>
-          <g class="bloom">
-            <path d="M57 84 C27 60 32 13 47 0 Q56 28 61 37 C64 8 86 -6 90 4 C95 43 82 72 57 84Z" fill="url(#petalGrad)" stroke="#c1d3ae" stroke-width="2"/>
-            <path d="M57 84 Q80 57 79 18 Q62 27 57 84" fill="#f6f0c8" opacity=".86"/>
-            <path d="M63 72 Q60 50 64 22" fill="none" stroke="#e1b349" stroke-width="9" stroke-linecap="round"/>
-          </g>
-        </svg>`;
-    }
 
     function renderPlants() {
       const holder = $('plants');
@@ -971,10 +1077,11 @@
       positions.forEach(([x, y], i) => {
         const plot = document.createElement('div');
         plot.className = 'flower-plot';
+        plot.style.setProperty('--glow', GAME_CONFIG.softSkills[i].color);
         plot.style.setProperty('--x', x + '%');
         plot.style.setProperty('--y', y + '%');
         plot.innerHTML = '<div class="soil-bed"></div>' +
-          '<div class="plant" id="plant-' + i + '">' + plantMarkup() + '</div>' +
+          '<div class="plant" id="plant-' + i + '">' + plantMarkup(i) + '</div>' +
           '<span class="plot-label">' + escapeHTML(GAME_CONFIG.softSkills[i].name) + '</span>';
         holder.appendChild(plot);
       });
@@ -984,11 +1091,11 @@
       const holder = $('ground-flowers');
       holder.innerHTML = '';
       const flowers = [
-        [5, 24, '#f3b7ce'], [10, 48, '#f6d36d'], [15, 16, '#b8a3ec'], [19, 40, '#ffd3dd'],
-        [23, 20, '#f8ce71'], [29, 52, '#c9b0f3'], [33, 26, '#f7b5c6'], [37, 44, '#ffe07f'],
-        [43, 18, '#b7dff3'], [47, 38, '#f6c8dd'], [53, 24, '#c6b3ef'], [58, 49, '#f7d56b'],
-        [63, 18, '#f5b9c9'], [69, 40, '#bee1f4'], [74, 22, '#e6c3f0'], [80, 50, '#f7d274'],
-        [85, 18, '#efb8d2'], [90, 42, '#bbd8f0'], [95, 24, '#f6d880']
+        [5, 24, '#ffffff'], [10, 48, '#f6d36d'], [15, 16, '#fff3d9'], [19, 40, '#ffe3d2'],
+        [23, 20, '#f8ce71'], [29, 52, '#ffffff'], [33, 26, '#ffd9c4'], [37, 44, '#ffe07f'],
+        [43, 18, '#fffaf0'], [47, 38, '#ffe8d6'], [53, 24, '#ffffff'], [58, 49, '#f7d56b'],
+        [63, 18, '#ffd9c4'], [69, 40, '#fffaf0'], [74, 22, '#ffffff'], [80, 50, '#f7d274'],
+        [85, 18, '#ffe3d2'], [90, 42, '#ffffff'], [95, 24, '#f6d880']
       ];
       flowers.forEach(([x, y, color], idx) => {
         const flower = document.createElement('span');
@@ -1009,6 +1116,7 @@
       GAME_CONFIG.softSkills.forEach((skill, i) => {
         const butterfly = document.createElement('div');
         butterfly.className = 'flier';
+        butterfly.style.setProperty('--glow', skill.color);
         butterfly.id = `butterfly-${i}`;
         butterfly.style.setProperty('--x', skill.start[0] + '%');
         butterfly.style.setProperty('--y', skill.start[1] + '%');
@@ -1056,6 +1164,7 @@
 
     function choose(type, value) {
       if (answered || !gameStarted) return;
+      SFX.select();
       if (type === 'dx') chosenDx = value; else chosenSoft = value;
       const group = $(type === 'dx' ? 'dx-options' : 'soft-options');
       [...group.children].forEach(btn => {
@@ -1085,6 +1194,8 @@
       $('scenario').textContent = '“' + GAME_CONFIG.situations[round].text + '”';
       $('round-label').textContent = `Situation ${String(round + 1).padStart(2, '0')}`;
       $('feedback').className = 'feedback';
+      hintLevel = 0; $('hint-box').hidden = true; $('hint-box').innerHTML = '';
+      $('hint-btn').disabled = false; $('hint-btn').textContent = '💡 Hint';
       $('action-bar').hidden = false;
       $('selection-hint').textContent = 'Select a Dx skill and a soft skill.';
       $('submit-btn').disabled = true;
@@ -1124,6 +1235,7 @@
       $('action-bar').hidden = true;
       [...$('dx-options').children, ...$('soft-options').children].forEach(btn => btn.disabled = true);
 
+      if (correct) { SFX.correct(); SFX.land(); } else SFX.wrong();
       if (correct && !collected.has(situation.soft)) {
         collected.add(situation.soft);
         bloom(situation.soft);
@@ -1155,6 +1267,8 @@
           return;
         }
         setTimerUI();
+        if (timerSeconds === 60 || timerSeconds === 30) SFX.warn();
+        else if (timerSeconds <= 10) SFX.tick();
       }, 1000);
     }
 
@@ -1171,6 +1285,7 @@
 
       updatePlayerUI();
       gameStarted = true;
+      SFX.start(); setTimeout(() => SFX.ambient(true), 900);
       $('start-screen').hidden = true;
       $('play-screen').hidden = false;
       timerSeconds = GAME_CONFIG.timeLimitSeconds;
@@ -1181,6 +1296,8 @@
 
     function endGame(byTimeout) {
       clearInterval(timerId);
+      SFX.ambient(false);
+      setTimeout(() => { collected.size === 5 ? SFX.win() : SFX.end(); }, 250);
       gameStarted = false;
       $('play-screen').hidden = true;
       $('final-screen').hidden = false;
@@ -1201,6 +1318,7 @@
 
     function resetGame() {
       clearInterval(timerId);
+      SFX.ambient(false);
       round = 0;
       chosenDx = '';
       chosenSoft = '';
@@ -1229,8 +1347,8 @@
       const ctx = canvas.getContext('2d');
 
       const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      bg.addColorStop(0, '#eef8ea');
-      bg.addColorStop(1, '#d4ebcf');
+      bg.addColorStop(0, '#14281b');
+      bg.addColorStop(1, '#1f3d2a');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -1243,25 +1361,25 @@
       ctx.beginPath(); ctx.arc(1260, 120, 78, 0, Math.PI * 2); ctx.fill();
 
       // Hills
-      ctx.fillStyle = '#c6e2ba';
+      ctx.fillStyle = '#223a28';
       ctx.beginPath(); ctx.ellipse(410, 720, 520, 110, 0, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.ellipse(1320, 745, 420, 100, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#90c283';
+      ctx.fillStyle = '#16291d';
       ctx.beginPath(); ctx.ellipse(810, 850, 950, 220, 0, 0, Math.PI * 2); ctx.fill();
 
       // Card
-      ctx.fillStyle = 'rgba(255,255,255,.92)';
+      ctx.fillStyle = 'rgba(12,26,17,.92)';
       roundRect(ctx, 105, 110, 820, 610, 30, true, false);
-      ctx.fillStyle = '#1b5f42';
+      ctx.fillStyle = '#e9c46a';
       ctx.font = '900 24px Arial';
       ctx.fillText('3 Years In, 3 Years Forward', 150, 160);
       ctx.font = '700 58px Georgia';
       ctx.fillText('Collect the Butterflies', 150, 235);
       ctx.font = '28px Arial';
-      ctx.fillStyle = '#597766';
+      ctx.fillStyle = '#cdbf9a';
       ctx.fillText('Garden Score Card', 150, 278);
 
-      ctx.fillStyle = '#f0f7ef';
+      ctx.fillStyle = 'rgba(255,255,255,.07)';
       roundRect(ctx, 150, 325, 340, 108, 20, true, false);
       roundRect(ctx, 520, 325, 340, 108, 20, true, false);
       roundRect(ctx, 150, 460, 340, 108, 20, true, false);
@@ -1274,15 +1392,15 @@
         ['Time Left', formatTime(timerSeconds), 550, 497],
       ];
       labels.forEach(([label, value, x, y]) => {
-        ctx.fillStyle = '#7a9181';
+        ctx.fillStyle = '#b9a96f';
         ctx.font = '900 18px Arial';
         ctx.fillText(label, x, y);
-        ctx.fillStyle = '#1d5c41';
+        ctx.fillStyle = '#f6efd8';
         ctx.font = '700 28px Arial';
         wrapText(ctx, value, x, y + 38, 290, 34);
       });
 
-      ctx.fillStyle = '#215f43';
+      ctx.fillStyle = '#e9c46a';
       ctx.font = '700 22px Arial';
       const message = collected.size === 5
         ? 'All five butterflies found their flowers!'
@@ -1293,7 +1411,7 @@
       drawScoreFlowers(ctx);
       drawScoreButterflies(ctx);
 
-      ctx.fillStyle = '#5d7c6a';
+      ctx.fillStyle = '#b9a96f';
       ctx.font = '20px Arial';
       ctx.fillText('Generated from Game 3 · Collect the Butterflies', 150, 770);
 
@@ -1408,11 +1526,225 @@
       ctx.restore();
     }
 
+    // ===== Sound effects (synthesized with Web Audio — no audio files needed) =====
+    const SFX = (() => {
+      let ctx = null, master = null, on = true, pad = null, twinkleTimer = null;
+      const ensure = () => {
+        if (!ctx) {
+          try {
+            ctx = new (window.AudioContext || window.webkitAudioContext)();
+            master = ctx.createGain(); master.gain.value = .85; master.connect(ctx.destination);
+          } catch (e) { return false; }
+        }
+        if (ctx.state === 'suspended') ctx.resume();
+        return true;
+      };
+      const tone = (f, d = .25, o = {}) => {
+        if (!on || !ensure()) return;
+        const { type = 'sine', vol = .15, delay = 0, slide = 0, attack = .006 } = o;
+        const t = ctx.currentTime + delay, osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(f, t);
+        if (slide) osc.frequency.exponentialRampToValueAtTime(f * slide, t + d);
+        g.gain.setValueAtTime(.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + attack);
+        g.gain.exponentialRampToValueAtTime(.0001, t + d);
+        osc.connect(g); g.connect(master); osc.start(t); osc.stop(t + d + .05);
+      };
+      const whoosh = (d = 1, vol = .05, from = 300, to = 5000, delay = 0) => {
+        if (!on || !ensure()) return;
+        const t = ctx.currentTime + delay, len = Math.floor(ctx.sampleRate * d);
+        const buf = ctx.createBuffer(1, len, ctx.sampleRate), data = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+        const src = ctx.createBufferSource(); src.buffer = buf;
+        const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.2;
+        bp.frequency.setValueAtTime(from, t); bp.frequency.exponentialRampToValueAtTime(to, t + d);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + d * .4); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+        src.connect(bp); bp.connect(g); g.connect(master); src.start(t);
+      };
+      const chime = (f, delay = 0, v = 1) => {
+        tone(f, 1, { vol: .13 * v, delay });
+        tone(f * 2, .65, { vol: .05 * v, delay });
+        tone(f * 3.01, .35, { vol: .025 * v, delay });
+      };
+      const twinkle = () => {
+        const notes = [784, 880, 1047, 1175, 1319, 1568];
+        tone(notes[Math.floor(Math.random() * notes.length)], 1.4, { vol: .022 });
+        twinkleTimer = setTimeout(twinkle, 2500 + Math.random() * 3500);
+      };
+      return {
+        get on() { return on; },
+        unlock: ensure,
+        toggle() { on = !on; if (!on) this.ambient(false); return on; },
+        click() { tone(520, .09, { type: 'triangle', vol: .09, slide: 1.3 }); },
+        hint() { tone(880, .35, { vol: .09 }); tone(1319, .5, { vol: .08, delay: .12 }); tone(1760, .6, { vol: .04, delay: .24 }); },
+        select() { tone(700, .12, { vol: .11 }); tone(1050, .1, { vol: .05, delay: .03 }); },
+        start() { [392, 494, 587, 784].forEach((f, i) => chime(f, i * .11)); whoosh(.9, .03, 200, 3000); },
+        correct() { [523, 659, 784, 1047, 1319].forEach((f, i) => chime(f, i * .09)); whoosh(1.2, .045, 300, 6000); },
+        land() { [1568, 1976, 2349].forEach((f, i) => tone(f, .2, { vol: .04, delay: .55 + i * .07 })); },
+        wrong() { tone(294, .35, { type: 'triangle', vol: .13, slide: .8 }); tone(220, .55, { type: 'triangle', vol: .11, delay: .18, slide: .85 }); },
+        tick() { tone(1000, .05, { type: 'square', vol: .03 }); },
+        warn() { tone(660, .18, { vol: .08 }); tone(660, .18, { vol: .08, delay: .25 }); },
+        win() { [523, 659, 784, 1047].forEach((f, i) => chime(f, i * .14)); [784, 988, 1175, 1568].forEach((f, i) => chime(f, .7 + i * .12, 1.1)); whoosh(1.6, .05, 300, 7000, .6); },
+        end() { [440, 392, 330].forEach((f, i) => chime(f, i * .2, .9)); },
+        ambient(run) {
+          if (!run) {
+            clearTimeout(twinkleTimer); twinkleTimer = null;
+            if (pad && ctx) { const { oscs, g } = pad; g.gain.cancelScheduledValues(ctx.currentTime); g.gain.setTargetAtTime(.0001, ctx.currentTime, .4); oscs.forEach(o => o.stop(ctx.currentTime + 2)); }
+            pad = null; return;
+          }
+          if (!on || pad || !ensure()) return;
+          const g = ctx.createGain(), lp = ctx.createBiquadFilter();
+          lp.type = 'lowpass'; lp.frequency.value = 520;
+          g.gain.setValueAtTime(.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.035, ctx.currentTime + 3);
+          lp.connect(g); g.connect(master);
+          const oscs = [130.81, 196, 261.63, 329.63].map((f, i) => {
+            const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.detune.value = (i - 1.5) * 5;
+            o.connect(lp); o.start(); return o;
+          });
+          pad = { oscs, g };
+          twinkleTimer = setTimeout(twinkle, 1500);
+        }
+      };
+    })();
+
+    // ===== Botanical set: orchid, hydrangea, lotus, protea, plumeria, calla, dill, gold-line leaves =====
+    const FLOWER_DEFS = (() => {
+      const S = (n, f) => Array.from({ length: n }, (_, i) => f(i)).join('');
+      const veins = S(6, i => { const y = -16 - i * 13; return `M0 ${y}L${-15 + i} ${y - 13}M0 ${y}L${15 - i} ${y - 13}`; });
+      const leafD = 'M0 0C-28-30-24-75 0-100C24-75 28-30 0 0Z';
+      const frond = S(17, i => {
+        const t = (i + 1) / 19, x = 36 * (1 - t) * t, y = -180 * (1 - t) * t - 200 * t * t, l = 46 * (1 - t * .65);
+        return `M${x} ${y}l${l} ${-l * .75}M${x} ${y}l${-l} ${-l * .75}`;
+      });
+      const pet = (fill) => `fill="${fill}" stroke="#d8d1b8" stroke-width=".8"`;
+      return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+        <linearGradient id="gLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f8a5b"/><stop offset="1" stop-color="#0f4a32"/></linearGradient>
+        <linearGradient id="gPet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9e3cb"/></linearGradient>
+        <linearGradient id="gPeach" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0e6"/><stop offset="1" stop-color="#f7b9a0"/></linearGradient>
+        <radialGradient id="gLotus" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#e6d6fa"/><stop offset="1" stop-color="#a98be0"/></radialGradient>
+        <g id="lf"><path d="${leafD}" fill="url(#gLeaf)" stroke="#d9b45a" stroke-width=".9"/><path d="M0 0V-96${veins}" stroke="#d9b45a" stroke-width=".6" fill="none"/></g>
+        <g id="lg"><path d="${leafD}" fill="rgba(20,60,40,.25)" stroke="#c9a24e" stroke-width="1"/><path d="M0 0V-96${veins}" stroke="#c9a24e" stroke-width=".7" fill="none"/></g>
+        <g id="fr"><path d="M0 0Q18-90 0-200" stroke="#3a7a52" stroke-width="3" fill="none"/><path d="${frond}" stroke="#2f7a50" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="${frond}" stroke="#c9a24e" stroke-width=".8" stroke-linecap="round" fill="none" opacity=".8"/></g>
+        <g id="bl">${S(5, i => `<path transform="rotate(${i * 72})" d="M0 0C-17-10-17-35 0-37C17-35 17-10 0 0Z" ${pet('url(#gPet)')}/>`)}<circle r="5" fill="#e9b949"/></g>
+        <g id="pk">${S(5, i => `<path transform="rotate(${i * 72})" d="M0 0C-18-8-18-34 0-36C18-34 18-8 0 0Z" fill="url(#gPeach)" stroke="#f0b49c" stroke-width=".8"/>`)}<circle r="5" fill="#f4a93c"/>${S(8, i => `<circle cx="${Math.cos(i) * 9}" cy="${Math.sin(i) * 9}" r="1.2" fill="#d9822b"/>`)}</g>
+        <g id="pl">${S(5, i => `<g transform="rotate(${i * 72})"><path d="M0 0C-9-14-4-42 15-46C32-32 23-8 0 0Z" ${pet('url(#gPet)')}/><path d="M0 0C-3-10 2-26 9-30C14-18 9-6 0 0Z" fill="#f8d79a" opacity=".85"/></g>`)}<circle r="4" fill="#f2b33c"/></g>
+        <g id="pro">${S(14, i => `<path transform="rotate(${i * 25.7})" d="M0-8L-7-36L0-46L7-36Z" fill="#e8b94f" stroke="#a87419" stroke-width=".6"/>`)}${S(12, i => `<path transform="rotate(${i * 30 + 15})" d="M0-6L-5-26L0-33L5-26Z" fill="#f3d27c" stroke="#b98622" stroke-width=".5"/>`)}<circle r="12" fill="#f6e7b9" stroke="#c9a24e" stroke-width=".8"/></g>
+        <g id="cf"><path d="M0 20C-34 8-42-34-20-60C-12-34 8-30 14-22C26-40 40-42 44-34C48-4 28 18 0 20Z" fill="url(#gPet)" stroke="#cfc9b0" stroke-width="1"/><path d="M3 8Q2-12 8-34" stroke="#e9b949" stroke-width="6.5" fill="none" stroke-linecap="round"/></g>
+        <g id="ca"><path d="M0 22C3 80-4 130 2 200" stroke="#2f7b52" stroke-width="4.5" fill="none" stroke-linecap="round"/><use href="#cf"/></g>
+        <g id="or"><ellipse cx="0" cy="-26" rx="15" ry="23" ${pet('url(#gPet)')}/><ellipse cx="-27" cy="-6" rx="26" ry="20" transform="rotate(-18 -27 -6)" ${pet('url(#gPet)')}/><ellipse cx="27" cy="-6" rx="26" ry="20" transform="rotate(18 27 -6)" ${pet('url(#gPet)')}/><ellipse cx="-16" cy="20" rx="13" ry="21" transform="rotate(28 -16 20)" ${pet('url(#gPet)')}/><ellipse cx="16" cy="20" rx="13" ry="21" transform="rotate(-28 16 20)" ${pet('url(#gPet)')}/><path d="M-7 4C-4-6 4-6 7 4C6 14 0 18 0 18C0 18-6 14-7 4Z" fill="#f2b8c8" stroke="#d98aa4" stroke-width=".6"/><circle cy="-2" r="3.4" fill="#f2b33c"/></g>
+        <g id="hy">${S(16, i => { const a = i * 2.4, r = 6.2 * Math.sqrt(i); return `<circle cx="${Math.cos(a) * r}" cy="${Math.sin(a) * r}" r="12" fill="#fff" stroke="#d9d3bb" stroke-width=".8"/><circle cx="${Math.cos(a) * r}" cy="${Math.sin(a) * r}" r="2" fill="#f1e6b8"/>`; })}</g>
+        <g id="lo">${S(7, i => `<path transform="rotate(${-72 + i * 24})" d="M0 0C-13-14-11-38 0-52C11-38 13-14 0 0Z" fill="url(#gLotus)" fill-opacity=".8" stroke="#efe6ff" stroke-width=".9"/>`)}<circle cy="-6" r="4" fill="#f2c96b"/></g>
+        <g id="um"><path d="M0 0V60" stroke="#cdbf8a" stroke-width="1.2"/>${S(11, i => { const a = (-80 + i * 16) * Math.PI / 180; const x = Math.sin(a) * 28, y = -Math.cos(a) * 28; return `<path d="M0 0L${x} ${y}" stroke="#cdbf8a" stroke-width=".8"/><circle cx="${x}" cy="${y}" r="2" fill="#e5d9a4"/>`; })}</g>
+        <g id="sp"><circle r="2.2" fill="#f2c96b"/></g>
+      </defs></svg>`;
+    })();
+
+    function buildBotanicals() {
+      const u = (id, x, y, s = 1, r = 0) => `<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s})"/>`;
+      const sparks = pts => pts.map(([x, y, s]) => u('sp', x, y, s)).join('');
+      const branch = '<path d="M10 70C60 60 110 40 170 30" stroke="#c9a24e" stroke-width="1" fill="none"/>';
+      const corners = {
+        tl: u('fr', -10, -10, 1.2, 135) + u('lg', 0, 170, 1.7, 148) + u('lg', 40, 0, 1.4, 118) + branch
+          + u('bl', 40, 62, .5, 10) + u('bl', 90, 48, .42, 30) + u('bl', 135, 32, .5, 0) + u('bl', 62, 95, .4, 50) + u('bl', 28, 20, .42, 20)
+          + u('or', 70, 165, .85, -22) + u('hy', 140, 120, .55) + sparks([[210, 70, 1], [150, 190, 1.2], [240, 150, .8]]),
+        tr: u('fr', 410, -10, 1.2, -135) + u('fr', 410, 30, .95, -108) + u('lg', 360, 0, 1.4, -120)
+          + u('pl', 340, 50, 1.45, 15) + u('pl', 285, 22, .95, 40) + u('pl', 378, 120, 1.05, -20) + u('pk', 250, 80, .5)
+          + sparks([[215, 40, 1], [255, 160, 1.2], [185, 105, .8]]),
+        bl: u('lf', 0, 420, 1.5, 24) + u('lf', 22, 420, 1.25, 52) + u('lg', 0, 390, 1.5, 78)
+          + u('hy', 62, 300, 1.05) + u('hy', 36, 238, .85) + u('hy', 104, 250, .7) + u('pro', 150, 366, 1.3, 5)
+          + u('lo', 230, 390, 1.1, 0) + u('pk', 185, 300, .55) + u('pk', 20, 340, .6)
+          + sparks([[240, 320, 1.2], [140, 220, 1], [290, 392, .9]]),
+        br: u('lf', 400, 420, 1.5, -24) + u('lf', 378, 420, 1.25, -52) + u('lg', 400, 390, 1.5, -78)
+          + u('ca', 322, 225, 1.05, -8) + u('ca', 372, 270, .95, 12) + u('ca', 265, 300, .75, -18)
+          + u('um', 215, 345, .9) + u('um', 190, 372, .65) + u('pk', 232, 392, .75) + u('bl', 200, 300, .45) + u('hy', 285, 385, .45)
+          + sparks([[185, 290, 1], [255, 205, 1.2], [155, 385, .9]])
+      };
+      $('botanicals').innerHTML = FLOWER_DEFS + Object.entries(corners).map(([k, v]) => `<svg class="corner ${k}" viewBox="0 0 400 400" aria-hidden="true">${v}</svg>`).join('');
+    }
+
+    // Each garden plot blooms into a different flower
+    const PLOT_BLOOMS = [
+      { id: 'cf', y: 66, s: 1.25 }, { id: 'pl', y: 56, s: 1.15 }, { id: 'hy', y: 52, s: 1.05 },
+      { id: 'lo', y: 82, s: 1.25 }, { id: 'or', y: 56, s: 1.1 }
+    ];
+    function plantMarkup(i) {
+      const b = PLOT_BLOOMS[i % PLOT_BLOOMS.length];
+      return `<svg viewBox="0 0 120 190" xmlns="http://www.w3.org/2000/svg">
+        <path d="M60 170C54 140 58 110 60 80" fill="none" stroke="#4f9a63" stroke-width="4.5" stroke-linecap="round"/>
+        <use href="#lf" transform="translate(59 140) rotate(-58) scale(.5)"/>
+        <use href="#lf" transform="translate(60 120) rotate(62) scale(.42)"/>
+        <g class="closed-bud"><path d="M60 82C47 66 50 40 60 26C70 40 73 66 60 82Z" fill="#d7e8bd" stroke="#d9b45a" stroke-width="1.6"/><path d="M60 78Q56 52 60 32" fill="none" stroke="#8fb46f" stroke-width="2"/></g>
+        <g class="bloom"><use href="#${b.id}" transform="translate(60 ${b.y}) scale(${b.s})"/></g>
+      </svg>`;
+    }
+
+    function buildFireflies() {
+      const scene = $('garden-scene');
+      for (let i = 0; i < 16; i++) {
+        const f = document.createElement('span');
+        f.className = 'firefly';
+        f.style.setProperty('--x', (Math.random() * 96 + 2) + '%');
+        f.style.setProperty('--y', (Math.random() * 80 + 6) + '%');
+        f.style.setProperty('--d', (4 + Math.random() * 5) + 's');
+        f.style.animationDelay = (-Math.random() * 4) + 's';
+        scene.appendChild(f);
+      }
+    }
+
+    function setupSound() {
+      const btn = $('sound-btn');
+      const label = () => { btn.textContent = SFX.on ? '🔊 Sound on' : '🔇 Sound off'; btn.setAttribute('aria-pressed', String(SFX.on)); };
+      btn.addEventListener('click', () => {
+        SFX.unlock();
+        SFX.toggle();
+        label();
+        if (SFX.on) { SFX.select(); if (gameStarted) SFX.ambient(true); }
+      });
+      // light click feedback on any button + first-gesture unlock (browsers require a tap before audio)
+      document.addEventListener('pointerdown', e => {
+        SFX.unlock();
+        const b = e.target.closest('button');
+        if (b && !b.disabled && !['sound-btn', 'ready-btn', 'submit-btn', 'hint-btn'].includes(b.id) && !b.classList.contains('option')) SFX.click();
+      });
+      $('player-cu').addEventListener('change', () => SFX.select());
+      label();
+    }
+
+    // ===== Hints: level 1 = clue, level 2 = cross out two wrong options per group =====
+    function useHint() {
+      if (!gameStarted || answered || hintLevel >= 2) return;
+      hintLevel += 1;
+      SFX.hint();
+      const s = GAME_CONFIG.situations[round], box = $('hint-box'), btn = $('hint-btn');
+      box.hidden = false;
+      if (hintLevel === 1) {
+        box.innerHTML = '<span aria-hidden="true">💡</span> <strong>Hint:</strong> ' + escapeHTML(s.hint);
+        btn.textContent = '💡 One more hint';
+      } else {
+        const cross = (wrapId, correct, val) => {
+          const wrong = [...$(wrapId).children].filter(b => val(b) !== correct).sort(() => Math.random() - .5).slice(0, 2);
+          wrong.forEach(b => { b.disabled = true; b.classList.add('eliminated'); b.setAttribute('aria-pressed', 'false'); });
+        };
+        cross('dx-options', s.dx, b => b.textContent);
+        cross('soft-options', s.soft, b => b.dataset.value);
+        const gone = (wrapId, val, chosen) => [...$(wrapId).children].some(b => b.disabled && val(b) === chosen);
+        if (gone('dx-options', b => b.textContent, chosenDx)) chosenDx = '';
+        if (gone('soft-options', b => b.dataset.value, chosenSoft)) chosenSoft = '';
+        $('submit-btn').disabled = !(chosenDx && chosenSoft);
+        $('selection-hint').textContent = chosenDx && chosenSoft ? `${chosenDx} + ${chosenSoft}` : 'Select a Dx skill and a soft skill.';
+        box.innerHTML += '<br><span aria-hidden="true">✂️</span> Two wrong choices in each group have been crossed out.';
+        btn.textContent = '💡 No more hints';
+        btn.disabled = true;
+      }
+    }
+
     // Events
     $('player-name').addEventListener('input', validateStartForm);
     $('player-cu').addEventListener('change', validateStartForm);
     $('ready-btn').addEventListener('click', startGame);
     $('submit-btn').addEventListener('click', checkPair);
+    $('hint-btn').addEventListener('click', useHint);
     $('next-btn').addEventListener('click', nextRound);
     $('replay-btn').addEventListener('click', resetGame);
     $('download-score-btn').addEventListener('click', downloadScorecard);
@@ -1425,6 +1757,9 @@
     updatePlayerUI();
     updateProgress();
     validateStartForm();
+    buildBotanicals();
+    buildFireflies();
+    setupSound();
   </script>
 </body>
 </html>
