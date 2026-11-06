@@ -842,12 +842,17 @@
     .option.eliminated { opacity: .28; text-decoration: line-through; cursor: not-allowed; }
     #hint-btn { min-height: 48px; }
     #hint-btn:disabled { opacity: .5; cursor: not-allowed; }
-    /* portrait layout */
-    .app { max-width: 600px; padding-left: 14px; padding-right: 14px; }
-    .workspace { grid-template-columns: 1fr; }
+    /* landscape layout: garden on the left, game on the right */
+    .app { max-width: 1440px; padding-left: 22px; padding-right: 22px; }
+    .workspace { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
     .game-panel { height: auto; }
-    .garden-scene { height: 470px; }
-    .result-img { display: block; width: 100%; height: auto; min-height: 240px; border-radius: 18px; background: #12211a; border: 1px solid rgba(233,196,106,.25); }
+    .garden-scene { height: 530px; }
+    .corner { width: clamp(170px, 22vw, 360px); }
+    @media (max-width: 950px) {
+      .workspace { grid-template-columns: 1fr; }
+      .garden-scene { height: 490px; }
+    }
+    .result-img { display: block; width: auto; max-width: 100%; max-height: calc(100vh - 230px); height: auto; min-height: 240px; margin: 0 auto; border-radius: 18px; background: #12211a; border: 1px solid rgba(233,196,106,.25); }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .dxfly { width: clamp(24px, 3.4vw, 38px); height: clamp(24px, 3.4vw, 38px); }
     .final-card .button-row { margin-top: 16px; }
