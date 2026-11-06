@@ -842,6 +842,15 @@
     .option.eliminated { opacity: .28; text-decoration: line-through; cursor: not-allowed; }
     #hint-btn { min-height: 48px; }
     #hint-btn:disabled { opacity: .5; cursor: not-allowed; }
+    /* portrait layout */
+    .app { max-width: 600px; padding-left: 14px; padding-right: 14px; }
+    .workspace { grid-template-columns: 1fr; }
+    .game-panel { height: auto; }
+    .garden-scene { height: 470px; }
+    .result-img { display: block; width: 100%; height: auto; min-height: 240px; border-radius: 18px; background: #12211a; border: 1px solid rgba(233,196,106,.25); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .dxfly { width: clamp(24px, 3.4vw, 38px); height: clamp(24px, 3.4vw, 38px); }
+    .final-card .button-row { margin-top: 16px; }
   </style>
 </head>
 <body>
@@ -851,7 +860,8 @@
       <div class="meta-row">
         <div class="chip" id="player-chip">👤 Waiting for player details</div>
         <div class="chip">🌸 Five flowers to bloom</div>
-        <button type="button" class="chip" id="sound-btn" aria-pressed="true">🔊 Sound on</button>
+        <button type="button" class="chip" id="sound-btn" aria-pressed="true">🔊 Effects on</button>
+        <button type="button" class="chip" id="music-btn" aria-pressed="true">🎵 Music on</button>
       </div>
     </header>
 
@@ -864,7 +874,7 @@
             <h1>Collect the Butterflies</h1>
             <p>Match one Dx skill with one soft skill. Every correct pair helps a butterfly land, a calla lily bloom, and the garden come alive.</p>
           </div>
-          <div class="chip collection-chip"><span aria-hidden="true">🦋</span> <span id="count">0</span> / 5 collected</div>
+          <div class="chip collection-chip"><span aria-hidden="true">🦋</span> <span id="count">0</span> / 10 collected</div>
         </div>
 
         <div class="garden-scene" id="garden-scene">
@@ -964,19 +974,13 @@
         </section>
 
         <section class="stack-card final-card" id="final-screen" hidden aria-live="polite">
-          <div class="final-medallion">🌷</div>
-          <h2>Your garden has grown!</h2>
-          <p class="support-copy" id="final-intro">Every bloom shows how digital transformation and human skills work together.</p>
-          <div class="score-line" id="final-score">0 / 5</div>
-          <p class="support-copy" id="final-message"></p>
-          <div class="summary-grid">
-            <div class="summary-box"><span class="label">Player</span><strong id="summary-name">—</strong></div>
-            <div class="summary-box"><span class="label">CU</span><strong id="summary-cu">—</strong></div>
-            <div class="summary-box"><span class="label">Butterflies Collected</span><strong id="summary-butterflies">0</strong></div>
-            <div class="summary-box"><span class="label">Time Left</span><strong id="summary-time">03:00</strong></div>
+          <img id="result-img" class="result-img" alt="Your garden score card" width="1080" height="1440">
+          <div class="sr-only">
+            <p id="final-intro"></p><div id="final-score"></div><p id="final-message"></p>
+            <span id="summary-name"></span><span id="summary-cu"></span><span id="summary-butterflies"></span><span id="summary-time"></span>
           </div>
           <div class="button-row">
-            <button type="button" class="primary" id="download-score-btn">Download score (JPG)</button>
+            <button type="button" class="primary" id="download-score-btn">⬇ Save my garden</button>
             <button type="button" class="secondary" id="replay-btn">Play again ↻</button>
           </div>
           <p class="fine-print">Prototype content note: only the first pair was confirmed from the supplied example. The other four situations remain editable sample content.</p>
@@ -992,11 +996,11 @@
     const GAME_CONFIG = {
       dxSkills: ['Process', 'People', 'Technology', 'Data', 'Policy'],
       softSkills: [
-        { name: 'Communication', color: '#f1c43f', target: [32, 20], start: [16, 28], speed: '3.8s' },
-        { name: 'Collaboration', color: '#ef92b0', target: [68, 20], start: [85, 26], speed: '3.2s' },
-        { name: 'Adaptability', color: '#73baf1', target: [18, 55], start: [36, 52], speed: '4.1s' },
-        { name: 'Critical Thinking', color: '#ab8de3', target: [50, 55], start: [61, 41], speed: '3.5s' },
-        { name: 'Empathy', color: '#67c6a0', target: [82, 55], start: [89, 43], speed: '4s' },
+        { quote: 'Clear updates help everyone move forward.', name: 'Communication', color: '#f1c43f', target: [32, 20], start: [16, 28], speed: '3.8s' },
+        { quote: 'Good ideas grow faster when offices share.', name: 'Collaboration', color: '#ef92b0', target: [68, 20], start: [85, 26], speed: '3.2s' },
+        { quote: 'Plans shift. Bend, don’t break.', name: 'Adaptability', color: '#73baf1', target: [18, 55], start: [36, 52], speed: '4.1s' },
+        { quote: 'Find the real cause before choosing a fix.', name: 'Critical Thinking', color: '#ab8de3', target: [50, 55], start: [61, 41], speed: '3.5s' },
+        { quote: 'Change goes better when people are guided, not pushed.', name: 'Empathy', color: '#67c6a0', target: [82, 55], start: [89, 43], speed: '4s' },
       ],
       situations: [
         { hint: 'Think about making the journey visible. Which skill is about telling people clearly where things stand?', text: 'A simple request passes through many steps, and people aren’t sure where it is.', dx: 'Process', soft: 'Communication', lesson: 'Map the steps and make the status visible. Clear communication helps everyone understand where a request is and what happens next.' },
@@ -1023,6 +1027,8 @@
     let gameStarted = false;
     let completedSituations = 0;
     let hintLevel = 0;
+    let dxCollected = new Set();
+    let results = [];
 
     function escapeHTML(str) {
       return String(str).replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
@@ -1123,6 +1129,11 @@
         butterfly.style.setProperty('--speed', skill.speed);
         butterfly.innerHTML = butterflySVG(skill.color);
         holder.appendChild(butterfly);
+        const dxf = document.createElement('div');
+        dxf.className = 'flier dxfly'; dxf.id = `dxfly-${i}`;
+        dxf.style.setProperty('--x', DX_FLY.start[i][0] + '%'); dxf.style.setProperty('--y', DX_FLY.start[i][1] + '%');
+        dxf.style.setProperty('--speed', (3 + i * .4) + 's'); dxf.style.setProperty('--glow', '#f3d27c');
+        dxf.innerHTML = butterflySVG('#f6dc8a'); holder.appendChild(dxf);
 
         const item = document.createElement('span');
         item.className = 'legend-item';
@@ -1176,7 +1187,7 @@
     }
 
     function updateProgress() {
-      $('count').textContent = String(collected.size);
+      $('count').textContent = String(totalButterflies());
       const progressCount = Math.min(GAME_CONFIG.situations.length, completedSituations);
       $('progress-label').textContent = progressCount < GAME_CONFIG.situations.length ? `Situation ${round + 1} of 5` : 'All 5 situations complete';
       $('progress-fill').style.width = `${(progressCount / GAME_CONFIG.situations.length) * 100}%`;
@@ -1225,20 +1236,25 @@
       completedSituations = Math.max(completedSituations, round + 1);
 
       const situation = GAME_CONFIG.situations[round];
-      const correct = chosenDx === situation.dx && chosenSoft === situation.soft;
+      const dxOk = chosenDx === situation.dx, softOk = chosenSoft === situation.soft, correct = dxOk && softOk;
+      results[round] = { dx: chosenDx, soft: chosenSoft, dxOk, softOk };
       const feedback = $('feedback');
-      feedback.className = 'feedback visible' + (correct ? '' : ' wrong');
-      $('feedback-heading').textContent = correct ? '✦ Perfect match! A butterfly found its flower.' : '↗ Not quite. The butterfly keeps flying.';
+      feedback.className = 'feedback visible' + (dxOk || softOk ? '' : ' wrong');
+      $('feedback-heading').textContent = correct ? '✦ Perfect match! Two butterflies landed.' : (dxOk || softOk) ? '✦ Half-way there! One butterfly landed, one keeps flying.' : '↗ Not quite. The butterflies keep flying.';
       $('correct-pair').textContent = `${situation.dx} + ${situation.soft}`;
       $('lesson').textContent = situation.lesson;
       $('next-btn').textContent = round === GAME_CONFIG.situations.length - 1 ? 'See my score →' : 'Next situation →';
       $('action-bar').hidden = true;
       [...$('dx-options').children, ...$('soft-options').children].forEach(btn => btn.disabled = true);
 
-      if (correct) { SFX.correct(); SFX.land(); } else SFX.wrong();
-      if (correct && !collected.has(situation.soft)) {
+      if (correct) { SFX.correct(); SFX.land(); } else if (dxOk || softOk) { SFX.select(); SFX.land(); } else SFX.wrong();
+      if (softOk && !collected.has(situation.soft)) {
         collected.add(situation.soft);
         bloom(situation.soft);
+      }
+      if (dxOk && !dxCollected.has(round)) {
+        dxCollected.add(round);
+        landDx(round);
       }
       updateProgress();
       scrollIntoViewSafe(feedback);
@@ -1297,22 +1313,23 @@
     function endGame(byTimeout) {
       clearInterval(timerId);
       SFX.ambient(false);
-      setTimeout(() => { collected.size === 5 ? SFX.win() : SFX.end(); }, 250);
+      setTimeout(() => { totalButterflies() === 10 ? SFX.win() : SFX.end(); }, 250);
       gameStarted = false;
       $('play-screen').hidden = true;
       $('final-screen').hidden = false;
-      $('final-score').textContent = `${collected.size} / 5 butterflies`;
+      $('final-score').textContent = `${totalButterflies()} / 10 butterflies`;
       $('final-intro').textContent = byTimeout ? 'Time is up, but your garden still shows what you learned.' : 'Every bloom shows how digital transformation and human skills work together.';
-      $('final-message').textContent = collected.size === 5
+      $('final-message').textContent = totalButterflies() === 10
         ? 'Wonderful work. All five butterflies found their flowers.'
         : byTimeout
           ? 'The timer ended. Review your score and try again to help more butterflies land.'
           : 'Nice work. Play again to help the remaining butterflies find their flowers.';
       $('summary-name').textContent = playerName || '—';
       $('summary-cu').textContent = playerCU || '—';
-      $('summary-butterflies').textContent = `${collected.size} of 5`;
+      $('summary-butterflies').textContent = `${totalButterflies()} of 10`;
       $('summary-time').textContent = formatTime(timerSeconds);
       updateProgress();
+      renderResult();
       scrollIntoViewSafe($('final-screen'));
     }
 
@@ -1323,7 +1340,7 @@
       chosenDx = '';
       chosenSoft = '';
       answered = false;
-      collected = new Set();
+      collected = new Set(); dxCollected = new Set(); results = [];
       timerSeconds = GAME_CONFIG.timeLimitSeconds;
       completedSituations = 0;
       gameStarted = false;
@@ -1340,195 +1357,154 @@
       scrollIntoViewSafe($('start-screen'));
     }
 
-    function downloadScorecard() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1600;
-      canvas.height = 900;
-      const ctx = canvas.getContext('2d');
+    // ===== Portrait result card: shown on screen AND saved as JPG =====
+    const DX_FLY = { start: [[8, 66], [28, 60], [52, 68], [74, 62], [92, 68]], target: [[14, 89], [31, 91], [50, 91], [69, 91], [86, 89]] };
+    let lastResultURL = '';
+    const totalButterflies = () => collected.size + dxCollected.size;
+    const shade = (hex, f) => '#' + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * f).toString(16).padStart(2, '0')).join('');
+    const seeded = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
-      const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      bg.addColorStop(0, '#14281b');
-      bg.addColorStop(1, '#1f3d2a');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Sun
-      const sun = ctx.createRadialGradient(1260, 120, 10, 1260, 120, 90);
-      sun.addColorStop(0, '#fffce9');
-      sun.addColorStop(.55, '#ffe78d');
-      sun.addColorStop(1, '#ffc956');
-      ctx.fillStyle = sun;
-      ctx.beginPath(); ctx.arc(1260, 120, 78, 0, Math.PI * 2); ctx.fill();
-
-      // Hills
-      ctx.fillStyle = '#223a28';
-      ctx.beginPath(); ctx.ellipse(410, 720, 520, 110, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(1320, 745, 420, 100, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#16291d';
-      ctx.beginPath(); ctx.ellipse(810, 850, 950, 220, 0, 0, Math.PI * 2); ctx.fill();
-
-      // Card
-      ctx.fillStyle = 'rgba(12,26,17,.92)';
-      roundRect(ctx, 105, 110, 820, 610, 30, true, false);
-      ctx.fillStyle = '#e9c46a';
-      ctx.font = '900 24px Arial';
-      ctx.fillText('3 Years In, 3 Years Forward', 150, 160);
-      ctx.font = '700 58px Georgia';
-      ctx.fillText('Collect the Butterflies', 150, 235);
-      ctx.font = '28px Arial';
-      ctx.fillStyle = '#cdbf9a';
-      ctx.fillText('Garden Score Card', 150, 278);
-
-      ctx.fillStyle = 'rgba(255,255,255,.07)';
-      roundRect(ctx, 150, 325, 340, 108, 20, true, false);
-      roundRect(ctx, 520, 325, 340, 108, 20, true, false);
-      roundRect(ctx, 150, 460, 340, 108, 20, true, false);
-      roundRect(ctx, 520, 460, 340, 108, 20, true, false);
-
-      const labels = [
-        ['Player', playerName || '—', 180, 362],
-        ['CU', playerCU || '—', 550, 362],
-        ['Butterflies Collected', `${collected.size} of 5`, 180, 497],
-        ['Time Left', formatTime(timerSeconds), 550, 497],
-      ];
-      labels.forEach(([label, value, x, y]) => {
-        ctx.fillStyle = '#b9a96f';
-        ctx.font = '900 18px Arial';
-        ctx.fillText(label, x, y);
-        ctx.fillStyle = '#f6efd8';
-        ctx.font = '700 28px Arial';
-        wrapText(ctx, value, x, y + 38, 290, 34);
-      });
-
-      ctx.fillStyle = '#e9c46a';
-      ctx.font = '700 22px Arial';
-      const message = collected.size === 5
-        ? 'All five butterflies found their flowers!'
-        : 'Keep growing your garden through every right pair.';
-      wrapText(ctx, message, 150, 635, 700, 34);
-
-      // Right-side decorative garden
-      drawScoreFlowers(ctx);
-      drawScoreButterflies(ctx);
-
-      ctx.fillStyle = '#b9a96f';
-      ctx.font = '20px Arial';
-      ctx.fillText('Generated from Game 3 · Collect the Butterflies', 150, 770);
-
-      const link = document.createElement('a');
-      const safeName = (playerName || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'player';
-      link.download = `${safeName}-garden-score.jpg`;
-      link.href = canvas.toDataURL('image/jpeg', 0.95);
-      link.click();
+    function landDx(i) {
+      const f = $(`dxfly-${i}`);
+      if (!f) return;
+      f.classList.add('landed');
+      f.style.left = DX_FLY.target[i][0] + '%';
+      f.style.top = DX_FLY.target[i][1] + '%';
     }
 
-    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-      if (fill) ctx.fill();
-      if (stroke) ctx.stroke();
-    }
-
-    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-      const words = String(text).split(' ');
-      let line = '';
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && n > 0) {
-          ctx.fillText(line.trim(), x, y);
-          line = words[n] + ' ';
-          y += lineHeight;
+    function gardenSVG(W, H) {
+      const r = seeded(11), defs = FLOWER_DEFS.match(/<defs>[\s\S]*<\/defs>/)[0];
+      const use = (id, x, y, s = 1, rot = 0) => `<use href="#${id}" transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"/>`;
+      const glows = GAME_CONFIG.softSkills.map((sk, i) => `<radialGradient id="gl${i}"><stop offset="0" stop-color="${sk.color}" stop-opacity=".55"/><stop offset="1" stop-color="${sk.color}" stop-opacity="0"/></radialGradient>`).join('')
+        + '<radialGradient id="glx"><stop offset="0" stop-color="#f6dc8a" stop-opacity=".6"/><stop offset="1" stop-color="#f6dc8a" stop-opacity="0"/></radialGradient>'
+        + '<radialGradient id="ff"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".9"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient>'
+        + '<radialGradient id="bg" cx=".5" cy=".45" r=".75"><stop offset="0" stop-color="#2d4a30"/><stop offset="1" stop-color="#112016"/></radialGradient>';
+      const bfly = (x, y, size, color, glowId, alpha) => `<g opacity="${alpha}"><circle cx="${x}" cy="${y}" r="${size * .95}" fill="url(#${glowId})"/>${butterflySVG(color).replace('<svg ', `<svg x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" `)}</g>`;
+      let g = `<rect width="${W}" height="${H}" fill="url(#bg)"/>`;
+      for (let i = 0; i < 26; i++) g += `<text x="${r() * W}" y="${r() * H * .62}" fill="#d9b45a" fill-opacity=".11" font-family="monospace" font-size="16">${Array.from({ length: 5 }, () => (r() > .5 ? 1 : 0)).join(' ')}</text>`;
+      g += `<ellipse cx="${W / 2}" cy="${H * .66}" rx="${W * .34}" ry="${H * .4}" fill="none" stroke="#d9b45a" stroke-opacity=".14"/>`;
+      g += `<ellipse cx="${W / 2}" cy="${H * 1.03}" rx="${W * .66}" ry="${H * .2}" fill="#244630"/>`;
+      for (let i = 0; i < 22; i++) g += `<circle cx="${r() * W}" cy="${r() * H * .9}" r="${6 + r() * 14}" fill="url(#ff)" opacity="${.3 + r() * .6}"/>`;
+      const xs = [.2, .35, .5, .65, .8], ys = [.55, .47, .34, .45, .56], gxs = [.275, .425, .575, .725, .885];
+      const fly = [[.12, .2], [.3, .13], [.52, .1], [.74, .15], [.9, .22]], dy = { cf: 28, pl: 6, hy: 6, lo: 36, or: 6 };
+      GAME_CONFIG.softSkills.forEach((sk, i) => {
+        const res = results[i] || {}, x = W * xs[i], y = H * ys[i], gy = H * .95, b = PLOT_BLOOMS[i], top = y + 34;
+        g += `<path d="M${x} ${gy}C${x - 9} ${(gy + top) / 2} ${x + 9} ${(gy + top) / 2 + 20} ${x} ${top}" stroke="#4f9a63" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+        g += use('lf', x, (gy + top) / 2 + 36, .6, -58) + use('lf', x, (gy + top) / 2 + 6, .5, 62);
+        if (res.softOk) {
+          g += `<circle cx="${x}" cy="${y}" r="110" fill="url(#gl${i})"/>` + use(b.id, x, y + dy[b.id], b.s * 1.55);
+          g += bfly(x, y - 62, 62, sk.color, `gl${i}`, 1);
         } else {
-          line = testLine;
+          g += `<g transform="translate(${x} ${top}) scale(1.5)"><path d="M0 0C-13-16-10-42 0-56C10-42 13-16 0 0Z" fill="#d7e8bd" stroke="#d9b45a" stroke-width="1.5"/></g>`;
+          g += bfly(W * fly[i][0], H * fly[i][1], 52, sk.color, `gl${i}`, .38);
         }
+        const gx = W * gxs[i], gfy = H * .9;
+        g += `<path d="M${gx} ${H * .98}Q${gx + 6} ${H * .94} ${gx} ${gfy}" stroke="#4f9a63" stroke-width="3" fill="none"/>` + use('bl', gx, gfy, .55);
+        g += res.dxOk ? bfly(gx, gfy - 34, 38, '#f6dc8a', 'glx', 1) : bfly(gx - 20, H * .7, 34, '#f6dc8a', 'glx', .3);
+      });
+      const art = cornerArt(), cs = .6, sz = 400 * cs;
+      g += `<g transform="scale(${cs})">${art.tl}</g><g transform="translate(${W - sz} 0) scale(${cs})">${art.tr}</g>`
+        + `<g transform="translate(0 ${H - sz}) scale(${cs})">${art.bl}</g><g transform="translate(${W - sz} ${H - sz}) scale(${cs})">${art.br}</g>`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${defs}<defs>${glows}</defs>${g}</svg>`;
+    }
+
+    function rr(ctx, x, y, w, h, rad) {
+      ctx.beginPath();
+      ctx.moveTo(x + rad, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rad); ctx.arcTo(x + w, y + h, x, y + h, rad);
+      ctx.arcTo(x, y + h, x, y, rad); ctx.arcTo(x, y, x + w, y, rad);
+      ctx.closePath();
+    }
+    function wrapLines(ctx, text, maxW) {
+      const words = String(text).split(' '), lines = []; let line = '';
+      words.forEach(w => { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    async function buildResultCard() {
+      try { await Promise.all([document.fonts.load('700 60px "Cormorant Garamond"'), document.fonts.load('400 40px "Cormorant Garamond"')]); } catch (e) {}
+      const SANS = 'system-ui, -apple-system, "Segoe UI", sans-serif', SERIF = '"Cormorant Garamond", Georgia, serif';
+      const cv = document.createElement('canvas'), W = 1080, sceneW = 920, sceneH = 540;
+      const measure = cv.getContext('2d');
+      const missed = GAME_CONFIG.situations.map((s, i) => ({ s, i })).filter(o => !(results[o.i] && results[o.i].dxOk && results[o.i].softOk));
+      const stillText = missed.map(o => `Situation ${o.i + 1}: ${o.s.dx} + ${o.s.soft}`).join('; ') + '.';
+      measure.font = `700 20px ${SANS}`;
+      const stillLines = missed.length ? wrapLines(measure, 'Still flying: ' + stillText, sceneW - 40) : [];
+      const stillH = stillLines.length ? 24 + stillLines.length * 28 : 0;
+      const cardsEnd = 846 + 3 * 94 + 2 * 14, stillY = cardsEnd + 16;
+      const lessonY = stillH ? stillY + stillH + 16 : cardsEnd + 16, lessonH = 100;
+      const cardBottom = lessonY + lessonH + 32, footY = cardBottom + 64, creditY = footY + 36, H = creditY + 46;
+      cv.width = W; cv.height = H;
+      const ctx = cv.getContext('2d'), ls = v => { if ('letterSpacing' in ctx) ctx.letterSpacing = v; };
+
+      const bg = ctx.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#1d2b1b'); bg.addColorStop(1, '#14211a');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      rr(ctx, 40, 36, W - 80, cardBottom - 36, 30); ctx.fillStyle = 'rgba(255,255,255,.025)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(233,196,106,.4)'; ctx.lineWidth = 2; ctx.stroke();
+
+      ctx.textAlign = 'center';
+      const tg = ctx.createLinearGradient(0, 80, 0, 150); tg.addColorStop(0, '#f6c75e'); tg.addColorStop(1, '#d58b1c');
+      ctx.fillStyle = tg; ctx.font = `700 70px ${SERIF}`; ctx.fillText('My Garden of Little Wings', W / 2, 142);
+      ctx.fillStyle = '#cfd6c0'; ctx.font = `26px ${SANS}`; ctx.fillText(playerName || 'Garden friend', W / 2, 192);
+
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(gardenSVG(sceneW, sceneH)); });
+      ctx.save(); rr(ctx, 80, 224, sceneW, sceneH, 26); ctx.clip(); ctx.drawImage(img, 80, 224, sceneW, sceneH); ctx.restore();
+      rr(ctx, 80, 224, sceneW, sceneH, 26); ctx.strokeStyle = 'rgba(233,196,106,.55)'; ctx.lineWidth = 2; ctx.stroke();
+
+      ctx.textAlign = 'left'; ls('5px'); ctx.fillStyle = '#d7dcc8'; ctx.font = `700 19px ${SANS}`; ctx.fillText('BUTTERFLIES IN YOUR GARDEN', 84, 826); ls('0px');
+      ctx.textAlign = 'right'; ctx.fillStyle = '#e0a63a'; ctx.font = `700 46px ${SERIF}`; ctx.fillText(`${totalButterflies()} of 10`, 1000, 830);
+
+      GAME_CONFIG.softSkills.forEach((sk, i) => {
+        const res = results[i] || {}, x = i % 2 ? 548 : 80, y = 846 + Math.floor(i / 2) * 108, w = 452, h = 94, n = (res.dxOk ? 1 : 0) + (res.softOk ? 1 : 0);
+        rr(ctx, x, y, w, h, 20); ctx.fillStyle = '#f3ead3'; ctx.fill();
+        ctx.beginPath(); ctx.arc(x + 54, y + 47, 31, 0, 7); ctx.fillStyle = '#16251a'; ctx.fill();
+        const og = ctx.createRadialGradient(x + 54, y + 47, 2, x + 54, y + 47, 25);
+        og.addColorStop(0, sk.color); og.addColorStop(1, shade(sk.color, .3));
+        ctx.globalAlpha = n ? 1 : .3; ctx.beginPath(); ctx.arc(x + 54, y + 47, 25, 0, 7); ctx.fillStyle = og; ctx.fill(); ctx.globalAlpha = 1;
+        const runs = [[GAME_CONFIG.situations[i].dx, '#566450', 400], [res.dxOk ? ' ✓' : ' ✗', res.dxOk ? '#2f8a4f' : '#d9822b', 700], [' + ', '#566450', 400],
+          [sk.name, shade(sk.color, .72), 700], [res.softOk ? ' ✓' : ' ✗', res.softOk ? '#2f8a4f' : '#d9822b', 700], [` · ${n} butterfl${n === 1 ? 'y' : 'ies'}`, '#6b7765', 400]];
+        let size = 17; const tw = sz => runs.reduce((a, [t, , wt]) => { ctx.font = `${wt} ${sz}px ${SANS}`; return a + ctx.measureText(t).width; }, 0);
+        const avail = w - 98 - 14, full = tw(17); if (full > avail) size = Math.max(12, 17 * avail / full);
+        let cx = x + 98; ctx.textAlign = 'left';
+        runs.forEach(([t, c, wt]) => { ctx.font = `${wt} ${size}px ${SANS}`; ctx.fillStyle = c; ctx.fillText(t, cx, y + 34); cx += ctx.measureText(t).width; });
+        ctx.font = `italic 19px Georgia, serif`; ctx.fillStyle = '#2f3b2b';
+        wrapLines(ctx, '“' + sk.quote + '”', avail).slice(0, 2).forEach((ln, k) => ctx.fillText(ln, x + 98, y + 62 + k * 23));
+      });
+
+      if (stillH) {
+        rr(ctx, 80, stillY, sceneW, stillH, 16); ctx.setLineDash([7, 6]); ctx.strokeStyle = 'rgba(233,196,106,.5)'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
+        ctx.font = `700 20px ${SANS}`; ctx.fillStyle = '#f0d98a'; ctx.textAlign = 'left';
+        stillLines.forEach((ln, k) => ctx.fillText(ln, 100, stillY + 36 + k * 28));
       }
-      ctx.fillText(line.trim(), x, y);
+      rr(ctx, 80, lessonY, sceneW, lessonH, 26); ctx.fillStyle = '#0f1a10'; ctx.fill(); ctx.strokeStyle = 'rgba(233,196,106,.35)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.textAlign = 'center'; ctx.fillStyle = '#f6efd8'; ctx.font = 'italic 38px Georgia, serif'; ctx.fillText('Every bloom starts with one small change.', W / 2, lessonY + 52);
+      ls('5px'); ctx.fillStyle = '#e0a63a'; ctx.font = `700 15px ${SANS}`; ctx.fillText('YOUR LESSON TO TAKE HOME', W / 2, lessonY + 82); ls('0px');
+      ctx.fillStyle = '#d9a53c'; ctx.font = `400 46px ${SERIF}`; ctx.fillText('Three Years In, Three Years Forward', W / 2, footY);
+      ctx.fillStyle = '#7f8c78'; ctx.font = `16px ${SANS}`; ctx.fillText('Office of the Vice President for Digital Transformation, University of the Philippines', W / 2, creditY);
+      return cv.toDataURL('image/jpeg', 0.93);
     }
 
-    function drawScoreFlowers(ctx) {
-      const stems = [1060, 1140, 1245, 1335, 1430];
-      stems.forEach((x, i) => {
-        const height = [165, 220, 260, 220, 165][i];
-        ctx.strokeStyle = '#457653';
-        ctx.lineWidth = 10;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(x, 785);
-        ctx.bezierCurveTo(x - 12, 740, x - 5, 690, x, 785 - height);
-        ctx.stroke();
-
-        ctx.fillStyle = i % 2 ? '#78b881' : '#95ca92';
-        ctx.beginPath(); ctx.moveTo(x, 730 - i * 5); ctx.quadraticCurveTo(x - 34, 695 - i * 5, x - 44, 710 - i * 5); ctx.quadraticCurveTo(x - 20, 736 - i * 5, x, 734 - i * 5); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x, 700 - i * 6); ctx.quadraticCurveTo(x + 36, 675 - i * 6, x + 46, 688 - i * 6); ctx.quadraticCurveTo(x + 18, 716 - i * 6, x, 711 - i * 6); ctx.fill();
-
-        const flowerY = 785 - height;
-        ctx.fillStyle = '#fffef3';
-        ctx.beginPath();
-        ctx.moveTo(x - 12, flowerY + 18);
-        ctx.bezierCurveTo(x - 44, flowerY - 3, x - 42, flowerY - 52, x - 20, flowerY - 66);
-        ctx.bezierCurveTo(x - 10, flowerY - 38, x + 2, flowerY - 28, x + 3, flowerY - 20);
-        ctx.bezierCurveTo(x + 8, flowerY - 52, x + 28, flowerY - 70, x + 34, flowerY - 58);
-        ctx.bezierCurveTo(x + 38, flowerY - 22, x + 22, flowerY + 4, x - 12, flowerY + 18);
-        ctx.fill();
-        ctx.strokeStyle = '#cad8bb';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.strokeStyle = '#e2b447';
-        ctx.lineWidth = 8;
-        ctx.beginPath();
-        ctx.moveTo(x + 2, flowerY + 4);
-        ctx.quadraticCurveTo(x + 6, flowerY - 20, x + 6, flowerY - 44);
-        ctx.stroke();
-      });
+    async function renderResult() {
+      const img = $('result-img');
+      img.removeAttribute('src'); img.alt = 'Growing your garden…'; lastResultURL = '';
+      try {
+        lastResultURL = await buildResultCard();
+        img.src = lastResultURL;
+        img.alt = `Garden score card for ${playerName || 'player'}: ${totalButterflies()} of 10 butterflies`;
+      } catch (e) { console.error('Could not build result card', e); }
     }
 
-    function drawScoreButterflies(ctx) {
-      GAME_CONFIG.softSkills.forEach((skill, i) => {
-        const x = 1040 + (i * 95);
-        const y = 210 + (i % 2 ? 55 : 0);
-        drawButterfly(ctx, x, y, skill.color, 0.8);
-      });
-    }
-
-    function drawButterfly(ctx, x, y, color, scale) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(scale, scale);
-      ctx.fillStyle = color;
-      ctx.strokeStyle = 'rgba(255,255,255,.7)';
-      ctx.lineWidth = 1.6;
-      const wings = [
-        [[-1,0],[-32,-40],[-60,-15],[-44,8],[-18,8],[-1,3]],
-        [[1,0],[32,-40],[60,-15],[44,8],[18,8],[1,3]],
-        [[-1,6],[-40,2],[-38,40],[-14,38],[-1,12]],
-        [[1,6],[40,2],[38,40],[14,38],[1,12]]
-      ];
-      wings.forEach(points => {
-        ctx.beginPath();
-        ctx.moveTo(points[0][0], points[0][1]);
-        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-      });
-      ctx.fillStyle = '#375c4a';
-      ctx.beginPath(); ctx.ellipse(0, 10, 4, 26, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(0, -4, 5, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#557462'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(-1, -4); ctx.quadraticCurveTo(-10, -18, -14, -16); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(1, -4); ctx.quadraticCurveTo(10, -18, 14, -16); ctx.stroke();
-      ctx.restore();
+    function downloadScorecard() {
+      if (!lastResultURL) return;
+      const safe = (playerName || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'player';
+      const a = document.createElement('a'); a.download = `${safe}-garden.jpg`; a.href = lastResultURL; a.click();
     }
 
     // ===== Sound effects (synthesized with Web Audio — no audio files needed) =====
     const SFX = (() => {
-      let ctx = null, master = null, on = true, pad = null, twinkleTimer = null;
+      let ctx = null, master = null, on = true, musicOn = true, musicRun = false, mTimer = null, mNext = 0, mStep = 0, bus = null;
       const ensure = () => {
         if (!ctx) {
           try {
@@ -1540,7 +1516,7 @@
         return true;
       };
       const tone = (f, d = .25, o = {}) => {
-        if (!on || !ensure()) return;
+        if ((!on && !o.music) || !ensure()) return;
         const { type = 'sine', vol = .15, delay = 0, slide = 0, attack = .006 } = o;
         const t = ctx.currentTime + delay, osc = ctx.createOscillator(), g = ctx.createGain();
         osc.type = type; osc.frequency.setValueAtTime(f, t);
@@ -1548,7 +1524,7 @@
         g.gain.setValueAtTime(.0001, t);
         g.gain.exponentialRampToValueAtTime(vol, t + attack);
         g.gain.exponentialRampToValueAtTime(.0001, t + d);
-        osc.connect(g); g.connect(master); osc.start(t); osc.stop(t + d + .05);
+        osc.connect(g); g.connect(o.dest || master); osc.start(t); osc.stop(t + d + .05);
       };
       const whoosh = (d = 1, vol = .05, from = 300, to = 5000, delay = 0) => {
         if (!on || !ensure()) return;
@@ -1567,15 +1543,63 @@
         tone(f * 2, .65, { vol: .05 * v, delay });
         tone(f * 3.01, .35, { vol: .025 * v, delay });
       };
-      const twinkle = () => {
-        const notes = [784, 880, 1047, 1175, 1319, 1568];
-        tone(notes[Math.floor(Math.random() * notes.length)], 1.4, { vol: .022 });
-        twinkleTimer = setTimeout(twinkle, 2500 + Math.random() * 3500);
+      // ---- Background music: generative loop (Cmaj7 - Am7 - Fmaj7 - G6) at 82 BPM ----
+      const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+      const EIGHTH = 60 / 82 / 2;
+      const CHORDS = [[48, 60, 64, 67, 71], [45, 57, 60, 64, 67], [41, 53, 57, 60, 64], [43, 55, 59, 62, 64]];
+      const PENTA = [72, 74, 76, 79, 81, 84];
+      const ARP = [0, 2, 1, 3, 2, 1, 3, 2];
+      const ensureBus = () => {
+        if (bus) return;
+        bus = ctx.createGain(); bus.gain.value = 0.0001;
+        const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3000;
+        const dly = ctx.createDelay(1); dly.delayTime.value = EIGHTH * 3;
+        const fb = ctx.createGain(); fb.gain.value = .34;
+        const wet = ctx.createGain(); wet.gain.value = .38;
+        bus.connect(lp); lp.connect(master); lp.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(wet); wet.connect(master);
+      };
+      const mnote = (m, d, vol, delay, type = 'triangle', attack = .012) =>
+        tone(mtof(m), d, { type, vol, delay, attack, music: true, dest: bus });
+      const scheduleStep = (step, t0) => {
+        const delay = Math.max(0, t0 - ctx.currentTime), s = step % 8, ch = CHORDS[Math.floor(step / 8) % 4], tones = ch.slice(1);
+        if (s === 0) {
+          ch.slice(1, 4).forEach(m => mnote(m, EIGHTH * 8.5, .05, delay, 'sine', .7));
+          mnote(ch[0], 1.1, .17, delay, 'sine', .02);
+        }
+        if (s === 4) mnote(ch[0], .8, .1, delay, 'sine', .02);
+        mnote(tones[ARP[s]] + 12, .6, .055, delay);
+        const odds = { 0: .75, 3: .4, 6: .5 }[s];
+        if (odds && Math.random() < odds) {
+          const m = PENTA[Math.floor(Math.random() * PENTA.length)];
+          mnote(m, 1.3, .075, delay, 'sine'); mnote(m + 12, .5, .02, delay, 'sine');
+        }
+      };
+      const pump = () => {
+        if (!ctx) return;
+        while (mNext < ctx.currentTime + 1.5) { scheduleStep(mStep, mNext); mNext += EIGHTH; mStep++; }
+      };
+      const musicStart = () => {
+        if (!musicOn || musicRun || !ensure()) return;
+        ensureBus(); musicRun = true;
+        bus.gain.cancelScheduledValues(ctx.currentTime);
+        bus.gain.setTargetAtTime(.8, ctx.currentTime, .9);
+        mNext = ctx.currentTime + .15; mStep = 0;
+        pump(); mTimer = setInterval(pump, 150);
+      };
+      const musicStop = () => {
+        if (!musicRun) return;
+        musicRun = false; clearInterval(mTimer);
+        bus.gain.cancelScheduledValues(ctx.currentTime);
+        bus.gain.setTargetAtTime(.0001, ctx.currentTime, .35);
       };
       return {
         get on() { return on; },
         unlock: ensure,
-        toggle() { on = !on; if (!on) this.ambient(false); return on; },
+        toggle() { on = !on; return on; },
+        get musicOn() { return musicOn; },
+        toggleMusic() { musicOn = !musicOn; if (musicOn) musicStart(); else musicStop(); return musicOn; },
+        musicStart, musicStop,
+        pause() { if (ctx && ctx.state === 'running') ctx.suspend(); },
         click() { tone(520, .09, { type: 'triangle', vol: .09, slide: 1.3 }); },
         hint() { tone(880, .35, { vol: .09 }); tone(1319, .5, { vol: .08, delay: .12 }); tone(1760, .6, { vol: .04, delay: .24 }); },
         select() { tone(700, .12, { vol: .11 }); tone(1050, .1, { vol: .05, delay: .03 }); },
@@ -1587,24 +1611,7 @@
         warn() { tone(660, .18, { vol: .08 }); tone(660, .18, { vol: .08, delay: .25 }); },
         win() { [523, 659, 784, 1047].forEach((f, i) => chime(f, i * .14)); [784, 988, 1175, 1568].forEach((f, i) => chime(f, .7 + i * .12, 1.1)); whoosh(1.6, .05, 300, 7000, .6); },
         end() { [440, 392, 330].forEach((f, i) => chime(f, i * .2, .9)); },
-        ambient(run) {
-          if (!run) {
-            clearTimeout(twinkleTimer); twinkleTimer = null;
-            if (pad && ctx) { const { oscs, g } = pad; g.gain.cancelScheduledValues(ctx.currentTime); g.gain.setTargetAtTime(.0001, ctx.currentTime, .4); oscs.forEach(o => o.stop(ctx.currentTime + 2)); }
-            pad = null; return;
-          }
-          if (!on || pad || !ensure()) return;
-          const g = ctx.createGain(), lp = ctx.createBiquadFilter();
-          lp.type = 'lowpass'; lp.frequency.value = 520;
-          g.gain.setValueAtTime(.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.035, ctx.currentTime + 3);
-          lp.connect(g); g.connect(master);
-          const oscs = [130.81, 196, 261.63, 329.63].map((f, i) => {
-            const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.detune.value = (i - 1.5) * 5;
-            o.connect(lp); o.start(); return o;
-          });
-          pad = { oscs, g };
-          twinkleTimer = setTimeout(twinkle, 1500);
-        }
+        ambient(run) { if (run) musicStart(); }
       };
     })();
 
@@ -1640,7 +1647,7 @@
       </defs></svg>`;
     })();
 
-    function buildBotanicals() {
+    function cornerArt() {
       const u = (id, x, y, s = 1, r = 0) => `<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s})"/>`;
       const sparks = pts => pts.map(([x, y, s]) => u('sp', x, y, s)).join('');
       const branch = '<path d="M10 70C60 60 110 40 170 30" stroke="#c9a24e" stroke-width="1" fill="none"/>';
@@ -1660,6 +1667,11 @@
           + u('um', 215, 345, .9) + u('um', 190, 372, .65) + u('pk', 232, 392, .75) + u('bl', 200, 300, .45) + u('hy', 285, 385, .45)
           + sparks([[185, 290, 1], [255, 205, 1.2], [155, 385, .9]])
       };
+      return corners;
+    }
+
+    function buildBotanicals() {
+      const corners = cornerArt();
       $('botanicals').innerHTML = FLOWER_DEFS + Object.entries(corners).map(([k, v]) => `<svg class="corner ${k}" viewBox="0 0 400 400" aria-hidden="true">${v}</svg>`).join('');
     }
 
@@ -1694,7 +1706,7 @@
 
     function setupSound() {
       const btn = $('sound-btn');
-      const label = () => { btn.textContent = SFX.on ? '🔊 Sound on' : '🔇 Sound off'; btn.setAttribute('aria-pressed', String(SFX.on)); };
+      const label = () => { btn.textContent = SFX.on ? '🔊 Effects on' : '🔇 Effects off'; btn.setAttribute('aria-pressed', String(SFX.on)); };
       btn.addEventListener('click', () => {
         SFX.unlock();
         SFX.toggle();
@@ -1703,11 +1715,16 @@
       });
       // light click feedback on any button + first-gesture unlock (browsers require a tap before audio)
       document.addEventListener('pointerdown', e => {
-        SFX.unlock();
+        SFX.unlock(); SFX.musicStart();
         const b = e.target.closest('button');
-        if (b && !b.disabled && !['sound-btn', 'ready-btn', 'submit-btn', 'hint-btn'].includes(b.id) && !b.classList.contains('option')) SFX.click();
+        if (b && !b.disabled && !['sound-btn', 'music-btn', 'ready-btn', 'submit-btn', 'hint-btn'].includes(b.id) && !b.classList.contains('option')) SFX.click();
       });
       $('player-cu').addEventListener('change', () => SFX.select());
+      const mb = $('music-btn');
+      const mlabel = () => { mb.textContent = SFX.musicOn ? '🎵 Music on' : '🎵 Music off'; mb.setAttribute('aria-pressed', String(SFX.musicOn)); };
+      mb.addEventListener('click', () => { SFX.unlock(); SFX.toggleMusic(); mlabel(); SFX.click(); });
+      document.addEventListener('visibilitychange', () => { if (document.hidden) SFX.pause(); else SFX.unlock(); });
+      mlabel();
       label();
     }
 
