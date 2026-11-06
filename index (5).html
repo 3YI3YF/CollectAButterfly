@@ -1,0 +1,1430 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e9f4e1">
+  <title>Game 3 · Collect the Butterflies | 3 Years In, 3 Years Forward</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1e3d31;
+      --sub: #5f7f71;
+      --forest: #1f6a4c;
+      --forest-dark: #155139;
+      --leaf: #6cb48b;
+      --line: #d9e7db;
+      --paper: #fffef9;
+      --mint: #edf6ea;
+      --shadow: 0 22px 60px rgba(29, 78, 54, 0.10);
+      --radius: 26px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(227, 246, 225, 0.95), transparent 28%),
+        radial-gradient(circle at 90% 20%, rgba(234, 246, 227, 0.9), transparent 22%),
+        linear-gradient(180deg, #f7fbf4 0%, #eef7ec 100%);
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .app {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 24px 18px 36px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--forest-dark);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #e4f3e6;
+      font-size: 18px;
+    }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid #d6e8d8;
+      color: var(--forest-dark);
+      font-size: 13px;
+      font-weight: 800;
+      backdrop-filter: blur(6px);
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      align-items: stretch;
+    }
+    .panel {
+      background: rgba(255,255,255,.88);
+      border: 1px solid #dbe9dd;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* LEFT: GARDEN */
+    .garden-panel {
+      background: linear-gradient(180deg, #eff9eb 0%, #e6f4e7 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .garden-header {
+      padding: 22px 22px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .eyebrow {
+      display: inline-block;
+      color: var(--forest);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .garden-header h1 {
+      margin: 0;
+      font: 700 clamp(28px, 4.3vw, 48px)/1.02 Georgia, "Times New Roman", serif;
+      letter-spacing: -.045em;
+    }
+    .garden-header p {
+      margin: 10px 0 0;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 600px;
+    }
+    .collection-chip {
+      min-width: 170px;
+      justify-content: center;
+      background: rgba(255,255,255,.92);
+    }
+    .garden-scene {
+      position: relative;
+      width: 100%;
+      height: 530px;
+      min-height: 0;
+      flex: 0 0 auto;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 15%, rgba(255,255,255,.78), transparent 53%),
+        linear-gradient(180deg, #eaf8eb 0%, #e3f2df 54%, #b9d9aa 100%);
+    }
+    .garden-scene::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      background: linear-gradient(180deg, #a2ca90, #86b879);
+      opacity: .65;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .sun {
+      position: absolute;
+      right: 48px;
+      top: 34px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fffce8 0%, #ffe98f 42%, #ffd45f 72%, #ffc84d 100%);
+      box-shadow: 0 0 0 14px rgba(255, 219, 111, 0.14), 0 0 44px rgba(255, 224, 127, 0.4);
+    }
+    .sun::before, .sun::after {
+      content: "";
+      position: absolute;
+      inset: -16px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 214, 79, 0.25);
+    }
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,.8);
+      border-radius: 999px;
+      height: 20px;
+      width: 92px;
+      box-shadow: 22px -10px 0 6px rgba(255,255,255,.78), 48px 0 0 0 rgba(255,255,255,.72);
+      opacity: .72;
+    }
+    .cloud.c1 { left: 40px; top: 60px; }
+    .cloud.c2 { left: 220px; top: 120px; transform: scale(.8); opacity: .6; }
+    .cloud.c3 { right: 180px; top: 150px; transform: scale(.9); }
+    /* Five individual beds replace the oversized arch. */
+    .flower-plot {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: clamp(100px, 24%, 165px);
+      height: 180px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .soil-bed {
+      position: absolute;
+      left: 0; right: 0; bottom: 3px;
+      height: 66px;
+      border-radius: 48% 48% 17px 17px / 32% 32% 17px 17px;
+      background:
+        radial-gradient(ellipse at 50% 8%, #956346 0%, #8a563b 43%, transparent 44%),
+        linear-gradient(180deg,#c18c5c 10%,#98613e 55%,#75482f 100%);
+      border: 3px solid #a67347;
+      box-shadow: inset 0 6px 0 rgba(242,195,141,.28), 0 8px 12px rgba(78,92,52,.16);
+    }
+    .soil-bed::before {
+      content: "";
+      position: absolute;
+      left: 8%; right: 8%; top: 4px;
+      height: 17px;
+      background: #64402d;
+      border-radius: 50%;
+      opacity: .78;
+    }
+    .plot-label {
+      position: absolute;
+      z-index: 5;
+      bottom: 12px;
+      left: 7px; right: 7px;
+      text-align: center;
+      font-size: clamp(9px, 1vw, 11px);
+      line-height: 1.25;
+      font-weight: 900;
+      color: #fff7db;
+      text-shadow: 0 1px 2px rgba(69,39,25,.75);
+      letter-spacing: .01em;
+    }
+    .scene-title {
+      position: absolute;
+      left: 28px;
+      top: 18px;
+      z-index: 3;
+      color: #245941;
+      font: italic 600 clamp(15px, 1.6vw, 22px)/1.2 Georgia, serif;
+      text-shadow: 0 1px 0 rgba(255,255,255,.65);
+    }
+    .ground-flowers {
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 170px;
+      pointer-events: none;
+    }
+    .mini-flower {
+      position: absolute;
+      bottom: var(--y);
+      left: var(--x);
+      width: var(--size);
+      height: var(--size);
+      transform: translateX(-50%);
+    }
+    .mini-flower::before,
+    .mini-flower::after {
+      content: "";
+      position: absolute;
+    }
+    .mini-flower::before {
+      left: calc(50% - 2px);
+      bottom: -18px;
+      width: 4px;
+      height: 22px;
+      border-radius: 99px;
+      background: linear-gradient(180deg, #5a955d 0%, #356c43 100%);
+    }
+    .mini-flower::after {
+      inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #f9f1b2 0 18%, transparent 19%),
+        radial-gradient(circle at 50% 0, var(--petal) 0 38%, transparent 39%),
+        radial-gradient(circle at 100% 50%, var(--petal) 0 38%, transparent 39%),
+        radial-gradient(circle at 50% 100%, var(--petal) 0 38%, transparent 39%),
+        radial-gradient(circle at 0 50%, var(--petal) 0 38%, transparent 39%);
+      filter: drop-shadow(0 5px 5px rgba(53,108,67,.08));
+    }
+    .scene-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .butterfly-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .flier {
+      width: clamp(35px, 4.4vw, 62px);
+      height: clamp(35px, 4.4vw, 62px);
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      transform: translate(-50%, -50%);
+      transition: left 1s cubic-bezier(.2,.86,.34,1), top 1s cubic-bezier(.2,.86,.34,1), filter .4s;
+      filter: drop-shadow(0 5px 10px rgba(44, 91, 61, .12));
+    }
+    .flier .flutter { width: 100%; height: 100%; display: block; animation: floaty var(--speed, 3.5s) ease-in-out infinite alternate; }
+    .flier .wings { transform-origin: center; animation: flap .36s ease-in-out infinite alternate; }
+    .flier.landed .flutter { animation: none; }
+    .flier.landed .wings { animation-duration: 1s; }
+    @keyframes floaty { 0% { transform: translate(-9px, 1px) rotate(-10deg); } 50% { transform: translate(4px, -10px) rotate(2deg); } 100% { transform: translate(10px, 0) rotate(9deg); } }
+    @keyframes flap { from { transform: scaleX(.64); } to { transform: scaleX(1); } }
+    .plants {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .flower-plot .plant {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 96px;
+      height: 150px;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+    .plant svg { width: 100%; height: 100%; display: block; }
+    .closed-bud { transition: transform .7s ease, opacity .45s ease; transform-origin: center bottom; }
+    .bloom { opacity: 0; transform: scale(.2) rotate(-10deg); transform-origin: center 70%; transition: opacity .25s ease, transform .9s cubic-bezier(.17, 1.26, .34, 1); }
+    .plant.bloomed .closed-bud { opacity: 0; transform: scale(.05); }
+    .plant.bloomed .bloom { opacity: 1; transform: scale(1) rotate(0); }
+    .legend {
+      margin-top: auto;
+      border-top: 1px solid #d9eadb;
+      padding: 14px 18px 18px;
+      background: rgba(255,255,255,.72);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      justify-content: center;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid #deece0;
+      color: #577162;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .legend-item .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--skill-color); box-shadow: 0 0 0 4px color-mix(in srgb, var(--skill-color) 20%, white); }
+    .legend-item .check { display: none; color: var(--forest-dark); }
+    .legend-item.collected { color: var(--forest-dark); }
+    .legend-item.collected .check { display: inline; }
+
+    /* RIGHT: GAME */
+    .game-panel {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: static;
+      min-width: 0;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, rgba(251, 254, 249, .95) 100%);
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .mini-card {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #fbfef9 100%);
+      padding: 14px 15px;
+      box-shadow: 0 10px 24px rgba(36, 76, 51, 0.06);
+    }
+    .mini-card .label {
+      display: block;
+      color: #698678;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+    .timer-display {
+      text-align: center;
+      border: 2px solid #d8e9db;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fcf5 100%);
+    }
+    .timer-display .time {
+      display: block;
+      font: 900 clamp(34px, 5vw, 52px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--forest-dark);
+      letter-spacing: .05em;
+    }
+    .timer-display.warn .time { color: #a8601e; }
+    .timer-display.danger .time { color: #a2362a; }
+    .player-card .value {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--forest-dark);
+      font-weight: 800;
+    }
+    .stack-card {
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.96);
+      padding: 20px;
+      box-shadow: 0 12px 28px rgba(30, 74, 49, 0.06);
+    }
+    .stack-card h2 {
+      margin: 0 0 10px;
+      font: 700 clamp(26px, 3vw, 34px)/1.06 Georgia, serif;
+      letter-spacing: -.03em;
+    }
+    .stack-card p, .support-copy {
+      margin: 0;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .form-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: #496958;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1.5px solid #d8e6da;
+      background: #fff;
+      color: var(--ink);
+    }
+    .field input:focus-visible,
+    .field select:focus-visible,
+    .option:focus-visible,
+    .primary:focus-visible,
+    .secondary:focus-visible {
+      outline: 3px solid #e4b84d;
+      outline-offset: 3px;
+    }
+    .player-note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #6b8a79;
+    }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .round-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: #ebf6ec;
+      color: #216744;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .progress-track {
+      width: 170px;
+      height: 10px;
+      border-radius: 999px;
+      background: #ddeadd;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #69b381 0%, #2e8357 100%);
+      transition: width .5s ease;
+    }
+    .scenario {
+      margin: 8px 0 10px;
+      font: 700 clamp(21px, 2.6vw, 29px)/1.32 Georgia, serif;
+      letter-spacing: -.02em;
+    }
+    .instruction {
+      color: #6a8577;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .choice-group h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #355c4a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-grid;
+      place-items: center;
+      background: #ebf4eb;
+      color: #275e40;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .option-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+    .option {
+      border: 1.5px solid #d8e6da;
+      background: #fff;
+      color: #3b5c4d;
+      border-radius: 14px;
+      min-height: 42px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      text-align: left;
+    }
+    .option:hover:not(:disabled) {
+      transform: translateY(-1px);
+      background: #f7fcf6;
+      border-color: #8ebfa0;
+    }
+    .option[aria-pressed="true"] {
+      background: #eaf7ee;
+      border-color: #2d7f54;
+      box-shadow: inset 0 0 0 1px #2d7f54;
+      color: #1f6947;
+    }
+    .option.skill { display: inline-flex; align-items: center; gap: 8px; }
+    .option.skill .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--skill-color); }
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #e7eee8;
+      flex-wrap: wrap;
+    }
+    .selection-hint {
+      color: #758f81;
+      font-size: 12px;
+      font-weight: 700;
+      min-height: 18px;
+    }
+    .primary, .secondary {
+      border: 0;
+      border-radius: 14px;
+      min-height: 48px;
+      padding: 12px 18px;
+      font-weight: 900;
+      letter-spacing: .01em;
+      transition: transform .15s ease, background .15s ease, filter .15s ease;
+    }
+    .primary {
+      background: var(--forest);
+      color: #fff;
+      box-shadow: 0 12px 20px rgba(27, 98, 67, 0.16);
+    }
+    .primary:hover:not(:disabled), .secondary:hover:not(:disabled) { transform: translateY(-1px); }
+    .primary:disabled { background: #aac7b1; cursor: not-allowed; box-shadow: none; }
+    .secondary {
+      background: #eef6ef;
+      color: var(--forest-dark);
+      border: 1px solid #d6e7d8;
+    }
+    .feedback {
+      display: none;
+      margin-top: 18px;
+      border-radius: 18px;
+      padding: 16px;
+      border: 1px solid #cfe6d3;
+      background: #f2fbf4;
+    }
+    .feedback.visible { display: block; }
+    .feedback.wrong {
+      border-color: #eadac1;
+      background: #fff9f1;
+    }
+    .feedback-heading {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 900;
+      color: #246b49;
+    }
+    .feedback.wrong .feedback-heading { color: #936126; }
+    .pair {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.95);
+      border: 1px solid #dce8de;
+      color: #236644;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .feedback.wrong .pair {
+      color: #8d5d26;
+      border-color: #ecdabc;
+    }
+    .feedback p {
+      margin: 0;
+      color: #4c6f5d;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .feedback-bottom {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+    .final-card {
+      text-align: center;
+    }
+    .final-medallion {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #eff8eb 0%, #dff0dd 100%);
+      font-size: 40px;
+    }
+    .score-line {
+      margin: 16px 0 8px;
+      font-size: 34px;
+      font-weight: 900;
+      color: var(--forest-dark);
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 18px 0 6px;
+      text-align: left;
+    }
+    .summary-box {
+      border-radius: 16px;
+      padding: 12px 13px;
+      background: #f7fbf5;
+      border: 1px solid #dfebe1;
+    }
+    .summary-box .label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #7b9283; font-weight: 900; display: block; margin-bottom: 5px; }
+    .summary-box strong { color: var(--forest-dark); font-size: 15px; }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .fine-print {
+      margin-top: 6px;
+      color: #829b8d;
+      font-size: 11px;
+      text-align: center;
+      line-height: 1.55;
+    }
+    [hidden] { display: none !important; }
+    @media (max-width: 950px) {
+      .workspace { grid-template-columns: 1fr; }
+      .game-panel { height: auto; }
+      .garden-scene { height: 490px; }
+    }
+    @media (max-width: 720px) {
+      .app { padding: 16px 12px 28px; }
+      .garden-scene { height: 490px; }
+      .flower-plot { width: clamp(92px, 24%, 135px); height: 155px; }
+      .flower-plot .plant { width: 76px; height: 120px; }
+      .soil-bed { height: 54px; }
+      .plot-label { bottom: 7px; font-size: 9px; }
+      .cloud.c2, .cloud.c3 { display: none; }
+      .sun { width: 78px; height: 78px; right: 24px; top: 40px; }
+      .scene-title { font-size: 15px; }
+
+      .garden-header { padding: 18px 16px 8px; }
+      .score-row, .summary-grid { grid-template-columns: 1fr; }
+      .action-bar, .button-row, .feedback-bottom { flex-direction: column; }
+      .primary, .secondary, .feedback-bottom .primary { width: 100%; }
+      .progress-top { align-items: start; }
+      .progress-track { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">🌱</span> 3 Years In, 3 Years Forward</div>
+      <div class="meta-row">
+        <div class="chip" id="player-chip">👤 Waiting for player details</div>
+        <div class="chip">🌼 Five flowers to bloom</div>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <section class="panel garden-panel" aria-label="Garden design and butterfly collection scene">
+        <div class="garden-header">
+          <div>
+            <span class="eyebrow">Game 03 · Garden of Growth</span>
+            <h1>Collect the Butterflies</h1>
+            <p>Match one Dx skill with one soft skill. Every correct pair helps a butterfly land, a calla lily bloom, and the garden come alive.</p>
+          </div>
+          <div class="chip collection-chip"><span aria-hidden="true">🦋</span> <span id="count">0</span> / 5 collected</div>
+        </div>
+
+        <div class="garden-scene" id="garden-scene">
+          <div class="sun" aria-hidden="true"></div>
+          <div class="cloud c1" aria-hidden="true"></div>
+          <div class="cloud c2" aria-hidden="true"></div>
+          <div class="cloud c3" aria-hidden="true"></div>
+          <div class="scene-title">Five flower plots. Five ways to grow.</div>
+          <div class="garden-path" aria-hidden="true"></div>
+          <div class="plants" id="plants" aria-hidden="true"></div>
+          <div class="butterfly-layer" id="butterflies" aria-hidden="true"></div>
+          <div class="ground-flowers" id="ground-flowers" aria-hidden="true"></div>
+        </div>
+
+        <div class="legend" id="legend" aria-label="Butterfly collection status"></div>
+      </section>
+
+      <aside class="panel game-panel" aria-label="Pair matching game controls">
+        <div class="score-row">
+          <div class="mini-card timer-display" id="timer-card" aria-live="polite">
+            <span class="label">Timer</span>
+            <span class="time" id="timer-text">03:00</span>
+          </div>
+          <div class="mini-card player-card">
+            <span class="label">Player</span>
+            <div class="value" id="player-display">Enter your name and CU to begin.</div>
+          </div>
+        </div>
+
+        <section class="stack-card" id="start-screen">
+          <h2>Ready to play?</h2>
+          <p class="support-copy">Before the timer begins, please enter your name and choose your constituent unit (CU). The 3-minute countdown starts only after you click <strong>Ready</strong>.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label for="player-name">Name</label>
+              <input id="player-name" type="text" placeholder="Enter your full name" maxlength="80" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="player-cu">Constituent Unit (CU)</label>
+              <select id="player-cu">
+                <option value="">Select your CU</option>
+                <option value="🌲 UP Baguio">🌲 UP Baguio</option>
+                <option value="⚔️ UP Cebu">⚔️ UP Cebu</option>
+                <option value="🌻 UP Diliman">🌻 UP Diliman</option>
+                <option value="⛰️ UP Los Baños">⛰️ UP Los Baños</option>
+                <option value="🏛️ UP Manila">🏛️ UP Manila</option>
+                <option value="🪶 UP Mindanao">🪶 UP Mindanao</option>
+                <option value="💻 UP Open University">💻 UP Open University</option>
+                <option value="💉 UP Philippine General Hospital">💉 UP Philippine General Hospital</option>
+                <option value="🌊 UP Tacloban">🌊 UP Tacloban</option>
+                <option value="🐟 UP Visayas">🐟 UP Visayas</option>
+              </select>
+            </div>
+          </div>
+          <p class="player-note">Tip: the player details will also appear on the downloadable JPG score card.</p>
+          <div class="button-row" style="justify-content:flex-start; margin-top:18px;">
+            <button type="button" class="primary" id="ready-btn" disabled>I'm Ready ▶</button>
+          </div>
+        </section>
+
+        <section class="stack-card" id="play-screen" hidden>
+          <div class="progress-top">
+            <span class="round-pill" id="round-label">Situation 01</span>
+            <div style="min-width: 170px; flex:1; max-width: 220px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; color:#708b7c; font-weight:800;">
+                <span id="progress-label">Situation 1 of 5</span><span>Progress</span>
+              </div>
+              <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" id="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+            </div>
+          </div>
+          <h2 class="scenario" id="scenario"></h2>
+          <p class="instruction">Choose one <strong>Dx skill</strong> and one <strong>soft skill</strong> that best fit this workplace situation.</p>
+          <div class="choices">
+            <section class="choice-group" aria-labelledby="dx-title">
+              <h3 id="dx-title"><span class="step">1</span> Pick a Dx skill</h3>
+              <div class="option-wrap" id="dx-options" role="group" aria-label="Digital transformation skills"></div>
+            </section>
+            <section class="choice-group" aria-labelledby="soft-title">
+              <h3 id="soft-title"><span class="step">2</span> Pick a soft skill</h3>
+              <div class="option-wrap" id="soft-options" role="group" aria-label="Soft skills"></div>
+            </section>
+          </div>
+          <div class="action-bar" id="action-bar">
+            <span class="selection-hint" id="selection-hint" aria-live="polite">Select a Dx skill and a soft skill.</span>
+            <button type="button" class="primary" id="submit-btn" disabled>Check my pair ↗</button>
+          </div>
+          <div class="feedback" id="feedback" role="status" aria-live="polite">
+            <div class="feedback-heading" id="feedback-heading"></div>
+            <div class="pair" id="correct-pair"></div>
+            <p id="lesson"></p>
+            <div class="feedback-bottom">
+              <button type="button" class="primary" id="next-btn">Next situation →</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="stack-card final-card" id="final-screen" hidden aria-live="polite">
+          <div class="final-medallion">🌷</div>
+          <h2>Your garden has grown!</h2>
+          <p class="support-copy" id="final-intro">Every bloom shows how digital transformation and human skills work together.</p>
+          <div class="score-line" id="final-score">0 / 5</div>
+          <p class="support-copy" id="final-message"></p>
+          <div class="summary-grid">
+            <div class="summary-box"><span class="label">Player</span><strong id="summary-name">—</strong></div>
+            <div class="summary-box"><span class="label">CU</span><strong id="summary-cu">—</strong></div>
+            <div class="summary-box"><span class="label">Butterflies Collected</span><strong id="summary-butterflies">0</strong></div>
+            <div class="summary-box"><span class="label">Time Left</span><strong id="summary-time">03:00</strong></div>
+          </div>
+          <div class="button-row">
+            <button type="button" class="primary" id="download-score-btn">Download score (JPG)</button>
+            <button type="button" class="secondary" id="replay-btn">Play again ↻</button>
+          </div>
+          <p class="fine-print">Prototype content note: only the first pair was confirmed from the supplied example. The other four situations remain editable sample content.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    'use strict';
+
+    const GAME_CONFIG = {
+      dxSkills: ['Process', 'People', 'Technology', 'Data', 'Policy'],
+      softSkills: [
+        { name: 'Communication', color: '#f1c43f', target: [32, 20], start: [16, 28], speed: '3.8s' },
+        { name: 'Collaboration', color: '#ef92b0', target: [68, 20], start: [85, 26], speed: '3.2s' },
+        { name: 'Adaptability', color: '#73baf1', target: [18, 55], start: [36, 52], speed: '4.1s' },
+        { name: 'Critical Thinking', color: '#ab8de3', target: [50, 55], start: [61, 41], speed: '3.5s' },
+        { name: 'Empathy', color: '#67c6a0', target: [82, 55], start: [89, 43], speed: '4s' },
+      ],
+      situations: [
+        { text: 'A simple request passes through many steps, and people aren’t sure where it is.', dx: 'Process', soft: 'Communication', lesson: 'Map the steps and make the status visible. Clear communication helps everyone understand where a request is and what happens next.' },
+        { text: 'Two units are solving the same problem separately, creating duplicate work.', dx: 'People', soft: 'Collaboration', lesson: 'Bring people together, clarify roles, and share progress. Collaboration reduces duplication and builds a shared solution.' },
+        { text: 'A new online platform is introduced, but employees hesitate to change their routines.', dx: 'Technology', soft: 'Adaptability', lesson: 'Introduce tools with practical support and room to learn. Adaptability helps people turn a new technology into a better habit.' },
+        { text: 'Different teams submit conflicting figures, making it hard to decide what to prioritize.', dx: 'Data', soft: 'Critical Thinking', lesson: 'Agree on reliable data definitions and question assumptions before drawing conclusions. Critical thinking makes evidence useful.' },
+        { text: 'Some users struggle to access a digital service because their needs were overlooked.', dx: 'Policy', soft: 'Empathy', lesson: 'Listen to people affected by a service and review the rules behind it. Empathy helps shape more inclusive digital policies.' },
+      ],
+      timeLimitSeconds: 180,
+    };
+
+    const $ = id => document.getElementById(id);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let playerName = '';
+    let playerCU = '';
+    let round = 0;
+    let chosenDx = '';
+    let chosenSoft = '';
+    let answered = false;
+    let collected = new Set();
+    let timerSeconds = GAME_CONFIG.timeLimitSeconds;
+    let timerId = null;
+    let gameStarted = false;
+    let completedSituations = 0;
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+    }
+
+    function formatTime(totalSeconds) {
+      const mins = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+      const secs = (totalSeconds % 60).toString().padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    function scrollIntoViewSafe(el) {
+      if (!el) return;
+      el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    }
+
+    function setTimerUI() {
+      $('timer-text').textContent = formatTime(timerSeconds);
+      const card = $('timer-card');
+      card.classList.remove('warn', 'danger');
+      if (timerSeconds <= 30) card.classList.add('danger');
+      else if (timerSeconds <= 60) card.classList.add('warn');
+    }
+
+    function updatePlayerUI() {
+      $('player-display').textContent = playerName && playerCU ? `${playerName} · ${playerCU}` : 'Enter your name and CU to begin.';
+      $('player-chip').textContent = playerName && playerCU ? `👤 ${playerName} · ${playerCU}` : '👤 Waiting for player details';
+    }
+
+    function butterflySVG(color) {
+      return `<svg class="flutter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 72" aria-hidden="true">
+        <g class="wings">
+          <path d="M39 31 C15 -7 -8 8 7 31 C13 42 25 41 39 37Z" fill="${color}" stroke="#ffffff" stroke-opacity=".65" stroke-width="1.6"/>
+          <path d="M41 31 C65 -7 88 8 73 31 C67 42 55 41 41 37Z" fill="${color}" stroke="#ffffff" stroke-opacity=".65" stroke-width="1.6"/>
+          <path d="M38 35 C9 31 12 63 31 60 C38 59 42 47 39 36Z" fill="${color}" opacity=".78" stroke="#ffffff" stroke-opacity=".6" stroke-width="1.4"/>
+          <path d="M42 35 C71 31 68 63 49 60 C42 59 38 47 41 36Z" fill="${color}" opacity=".78" stroke="#ffffff" stroke-opacity=".6" stroke-width="1.4"/>
+          <circle cx="19" cy="25" r="3.4" fill="white" opacity=".68"/><circle cx="61" cy="25" r="3.4" fill="white" opacity=".68"/>
+          <circle cx="26" cy="48" r="2.6" fill="white" opacity=".6"/><circle cx="54" cy="48" r="2.6" fill="white" opacity=".6"/>
+        </g>
+        <path d="M39 24 Q32 10 29 15 M41 24 Q48 10 51 15" fill="none" stroke="#557462" stroke-width="2" stroke-linecap="round"/>
+        <path d="M40 27 Q36 37 40 56 Q44 37 40 27Z" fill="#375c4a"/><circle cx="40" cy="27" r="4" fill="#375c4a"/>
+      </svg>`;
+    }
+
+    function plantMarkup() {
+      return `
+        <svg viewBox="0 0 120 190" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="petalGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ffffff"/>
+              <stop offset=".5" stop-color="#fffef2"/>
+              <stop offset="1" stop-color="#edf0df"/>
+            </linearGradient>
+          </defs>
+          <path d="M60 160 C55 126 56 100 60 68" fill="none" stroke="#417b52" stroke-width="6" stroke-linecap="round"/>
+          <path d="M59 130 Q31 101 20 115 Q37 139 58 138Z" fill="#78b780" stroke="#4a8b62" stroke-width="1.6"/>
+          <path d="M60 118 Q85 98 98 109 Q83 132 60 129Z" fill="#90c98c" stroke="#55966a" stroke-width="1.6"/>
+          <g class="closed-bud">
+            <path d="M60 67 C44 53 47 24 60 9 C75 22 76 52 60 67Z" fill="#e7efb9" stroke="#6f9b6e" stroke-width="2"/>
+            <path d="M60 63 Q55 39 60 18" fill="none" stroke="#b3cf8c" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <g class="bloom">
+            <path d="M57 84 C27 60 32 13 47 0 Q56 28 61 37 C64 8 86 -6 90 4 C95 43 82 72 57 84Z" fill="url(#petalGrad)" stroke="#c1d3ae" stroke-width="2"/>
+            <path d="M57 84 Q80 57 79 18 Q62 27 57 84" fill="#f6f0c8" opacity=".86"/>
+            <path d="M63 72 Q60 50 64 22" fill="none" stroke="#e1b349" stroke-width="9" stroke-linecap="round"/>
+          </g>
+        </svg>`;
+    }
+
+    function renderPlants() {
+      const holder = $('plants');
+      holder.innerHTML = '';
+      // Two back-row plots and three front-row plots. Flower artwork is
+      // fixed-size and never stretched to fill the panel.
+      const positions = [[32, 35], [68, 35], [18, 73], [50, 73], [82, 73]];
+      positions.forEach(([x, y], i) => {
+        const plot = document.createElement('div');
+        plot.className = 'flower-plot';
+        plot.style.setProperty('--x', x + '%');
+        plot.style.setProperty('--y', y + '%');
+        plot.innerHTML = '<div class="soil-bed"></div>' +
+          '<div class="plant" id="plant-' + i + '">' + plantMarkup() + '</div>' +
+          '<span class="plot-label">' + escapeHTML(GAME_CONFIG.softSkills[i].name) + '</span>';
+        holder.appendChild(plot);
+      });
+    }
+
+    function renderGroundFlowers() {
+      const holder = $('ground-flowers');
+      holder.innerHTML = '';
+      const flowers = [
+        [5, 24, '#f3b7ce'], [10, 48, '#f6d36d'], [15, 16, '#b8a3ec'], [19, 40, '#ffd3dd'],
+        [23, 20, '#f8ce71'], [29, 52, '#c9b0f3'], [33, 26, '#f7b5c6'], [37, 44, '#ffe07f'],
+        [43, 18, '#b7dff3'], [47, 38, '#f6c8dd'], [53, 24, '#c6b3ef'], [58, 49, '#f7d56b'],
+        [63, 18, '#f5b9c9'], [69, 40, '#bee1f4'], [74, 22, '#e6c3f0'], [80, 50, '#f7d274'],
+        [85, 18, '#efb8d2'], [90, 42, '#bbd8f0'], [95, 24, '#f6d880']
+      ];
+      flowers.forEach(([x, y, color], idx) => {
+        const flower = document.createElement('span');
+        flower.className = 'mini-flower';
+        flower.style.setProperty('--x', x + '%');
+        flower.style.setProperty('--y', y + 'px');
+        flower.style.setProperty('--size', (idx % 4 === 0 ? 24 : idx % 3 === 0 ? 20 : 18) + 'px');
+        flower.style.setProperty('--petal', color);
+        holder.appendChild(flower);
+      });
+    }
+
+    function renderButterflies() {
+      const holder = $('butterflies');
+      const legend = $('legend');
+      holder.innerHTML = '';
+      legend.innerHTML = '';
+      GAME_CONFIG.softSkills.forEach((skill, i) => {
+        const butterfly = document.createElement('div');
+        butterfly.className = 'flier';
+        butterfly.id = `butterfly-${i}`;
+        butterfly.style.setProperty('--x', skill.start[0] + '%');
+        butterfly.style.setProperty('--y', skill.start[1] + '%');
+        butterfly.style.setProperty('--speed', skill.speed);
+        butterfly.innerHTML = butterflySVG(skill.color);
+        holder.appendChild(butterfly);
+
+        const item = document.createElement('span');
+        item.className = 'legend-item';
+        item.id = `legend-${i}`;
+        item.style.setProperty('--skill-color', skill.color);
+        item.innerHTML = `<span class="dot"></span>${escapeHTML(skill.name)} <span class="check">✓</span>`;
+        legend.appendChild(item);
+      });
+    }
+
+    function makeOptions() {
+      const dxWrap = $('dx-options');
+      const softWrap = $('soft-options');
+      dxWrap.innerHTML = '';
+      softWrap.innerHTML = '';
+
+      GAME_CONFIG.dxSkills.forEach(label => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option';
+        btn.textContent = label;
+        btn.setAttribute('aria-pressed', 'false');
+        btn.addEventListener('click', () => choose('dx', label));
+        dxWrap.appendChild(btn);
+      });
+
+      GAME_CONFIG.softSkills.forEach(skill => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option skill';
+        btn.style.setProperty('--skill-color', skill.color);
+        btn.dataset.value = skill.name;
+        btn.innerHTML = `<span class="dot"></span>${escapeHTML(skill.name)}`;
+        btn.setAttribute('aria-pressed', 'false');
+        btn.addEventListener('click', () => choose('soft', skill.name));
+        softWrap.appendChild(btn);
+      });
+    }
+
+    function choose(type, value) {
+      if (answered || !gameStarted) return;
+      if (type === 'dx') chosenDx = value; else chosenSoft = value;
+      const group = $(type === 'dx' ? 'dx-options' : 'soft-options');
+      [...group.children].forEach(btn => {
+        const current = type === 'dx' ? btn.textContent : btn.dataset.value;
+        btn.setAttribute('aria-pressed', String(current === value));
+      });
+      $('submit-btn').disabled = !(chosenDx && chosenSoft);
+      $('selection-hint').textContent = chosenDx && chosenSoft ? `${chosenDx} + ${chosenSoft}` : 'Select a Dx skill and a soft skill.';
+    }
+
+    function updateProgress() {
+      $('count').textContent = String(collected.size);
+      const progressCount = Math.min(GAME_CONFIG.situations.length, completedSituations);
+      $('progress-label').textContent = progressCount < GAME_CONFIG.situations.length ? `Situation ${round + 1} of 5` : 'All 5 situations complete';
+      $('progress-fill').style.width = `${(progressCount / GAME_CONFIG.situations.length) * 100}%`;
+      $('progress-track').setAttribute('aria-valuenow', String(progressCount));
+    }
+
+    function showRound() {
+      if (round >= GAME_CONFIG.situations.length) {
+        endGame(false);
+        return;
+      }
+      chosenDx = '';
+      chosenSoft = '';
+      answered = false;
+      $('scenario').textContent = '“' + GAME_CONFIG.situations[round].text + '”';
+      $('round-label').textContent = `Situation ${String(round + 1).padStart(2, '0')}`;
+      $('feedback').className = 'feedback';
+      $('action-bar').hidden = false;
+      $('selection-hint').textContent = 'Select a Dx skill and a soft skill.';
+      $('submit-btn').disabled = true;
+      makeOptions();
+      updateProgress();
+    }
+
+    function bloom(skillName) {
+      const idx = GAME_CONFIG.softSkills.findIndex(skill => skill.name === skillName);
+      if (idx < 0) return;
+      const skill = GAME_CONFIG.softSkills[idx];
+      const butterfly = $(`butterfly-${idx}`);
+      const plant = $(`plant-${idx}`);
+      if (butterfly) {
+        butterfly.classList.add('landed');
+        butterfly.style.left = skill.target[0] + '%';
+        butterfly.style.top = skill.target[1] + '%';
+      }
+      if (plant) plant.classList.add('bloomed');
+      const legend = $(`legend-${idx}`);
+      if (legend) legend.classList.add('collected');
+    }
+
+    function checkPair() {
+      if (!gameStarted || answered || !chosenDx || !chosenSoft) return;
+      answered = true;
+      completedSituations = Math.max(completedSituations, round + 1);
+
+      const situation = GAME_CONFIG.situations[round];
+      const correct = chosenDx === situation.dx && chosenSoft === situation.soft;
+      const feedback = $('feedback');
+      feedback.className = 'feedback visible' + (correct ? '' : ' wrong');
+      $('feedback-heading').textContent = correct ? '✦ Perfect match! A butterfly found its flower.' : '↗ Not quite. The butterfly keeps flying.';
+      $('correct-pair').textContent = `${situation.dx} + ${situation.soft}`;
+      $('lesson').textContent = situation.lesson;
+      $('next-btn').textContent = round === GAME_CONFIG.situations.length - 1 ? 'See my score →' : 'Next situation →';
+      $('action-bar').hidden = true;
+      [...$('dx-options').children, ...$('soft-options').children].forEach(btn => btn.disabled = true);
+
+      if (correct && !collected.has(situation.soft)) {
+        collected.add(situation.soft);
+        bloom(situation.soft);
+      }
+      updateProgress();
+      scrollIntoViewSafe(feedback);
+    }
+
+    function nextRound() {
+      if (!answered) return;
+      round += 1;
+      if (round >= GAME_CONFIG.situations.length) {
+        endGame(false);
+        return;
+      }
+      showRound();
+      scrollIntoViewSafe($('play-screen'));
+    }
+
+    function startTimer() {
+      clearInterval(timerId);
+      timerId = setInterval(() => {
+        timerSeconds -= 1;
+        if (timerSeconds <= 0) {
+          timerSeconds = 0;
+          setTimerUI();
+          clearInterval(timerId);
+          endGame(true);
+          return;
+        }
+        setTimerUI();
+      }, 1000);
+    }
+
+    function validateStartForm() {
+      const name = $('player-name').value.trim();
+      const cu = $('player-cu').value;
+      $('ready-btn').disabled = !(name && cu);
+    }
+
+    function startGame() {
+      playerName = $('player-name').value.trim();
+      playerCU = $('player-cu').value;
+      if (!playerName || !playerCU) return;
+
+      updatePlayerUI();
+      gameStarted = true;
+      $('start-screen').hidden = true;
+      $('play-screen').hidden = false;
+      timerSeconds = GAME_CONFIG.timeLimitSeconds;
+      setTimerUI();
+      showRound();
+      startTimer();
+    }
+
+    function endGame(byTimeout) {
+      clearInterval(timerId);
+      gameStarted = false;
+      $('play-screen').hidden = true;
+      $('final-screen').hidden = false;
+      $('final-score').textContent = `${collected.size} / 5 butterflies`;
+      $('final-intro').textContent = byTimeout ? 'Time is up, but your garden still shows what you learned.' : 'Every bloom shows how digital transformation and human skills work together.';
+      $('final-message').textContent = collected.size === 5
+        ? 'Wonderful work. All five butterflies found their flowers.'
+        : byTimeout
+          ? 'The timer ended. Review your score and try again to help more butterflies land.'
+          : 'Nice work. Play again to help the remaining butterflies find their flowers.';
+      $('summary-name').textContent = playerName || '—';
+      $('summary-cu').textContent = playerCU || '—';
+      $('summary-butterflies').textContent = `${collected.size} of 5`;
+      $('summary-time').textContent = formatTime(timerSeconds);
+      updateProgress();
+      scrollIntoViewSafe($('final-screen'));
+    }
+
+    function resetGame() {
+      clearInterval(timerId);
+      round = 0;
+      chosenDx = '';
+      chosenSoft = '';
+      answered = false;
+      collected = new Set();
+      timerSeconds = GAME_CONFIG.timeLimitSeconds;
+      completedSituations = 0;
+      gameStarted = false;
+      setTimerUI();
+      updatePlayerUI();
+      $('start-screen').hidden = false;
+      $('play-screen').hidden = true;
+      $('final-screen').hidden = true;
+      $('feedback').className = 'feedback';
+      renderPlants();
+      renderButterflies();
+      updateProgress();
+      validateStartForm();
+      scrollIntoViewSafe($('start-screen'));
+    }
+
+    function downloadScorecard() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1600;
+      canvas.height = 900;
+      const ctx = canvas.getContext('2d');
+
+      const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bg.addColorStop(0, '#eef8ea');
+      bg.addColorStop(1, '#d4ebcf');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Sun
+      const sun = ctx.createRadialGradient(1260, 120, 10, 1260, 120, 90);
+      sun.addColorStop(0, '#fffce9');
+      sun.addColorStop(.55, '#ffe78d');
+      sun.addColorStop(1, '#ffc956');
+      ctx.fillStyle = sun;
+      ctx.beginPath(); ctx.arc(1260, 120, 78, 0, Math.PI * 2); ctx.fill();
+
+      // Hills
+      ctx.fillStyle = '#c6e2ba';
+      ctx.beginPath(); ctx.ellipse(410, 720, 520, 110, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(1320, 745, 420, 100, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#90c283';
+      ctx.beginPath(); ctx.ellipse(810, 850, 950, 220, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Card
+      ctx.fillStyle = 'rgba(255,255,255,.92)';
+      roundRect(ctx, 105, 110, 820, 610, 30, true, false);
+      ctx.fillStyle = '#1b5f42';
+      ctx.font = '900 24px Arial';
+      ctx.fillText('3 Years In, 3 Years Forward', 150, 160);
+      ctx.font = '700 58px Georgia';
+      ctx.fillText('Collect the Butterflies', 150, 235);
+      ctx.font = '28px Arial';
+      ctx.fillStyle = '#597766';
+      ctx.fillText('Garden Score Card', 150, 278);
+
+      ctx.fillStyle = '#f0f7ef';
+      roundRect(ctx, 150, 325, 340, 108, 20, true, false);
+      roundRect(ctx, 520, 325, 340, 108, 20, true, false);
+      roundRect(ctx, 150, 460, 340, 108, 20, true, false);
+      roundRect(ctx, 520, 460, 340, 108, 20, true, false);
+
+      const labels = [
+        ['Player', playerName || '—', 180, 362],
+        ['CU', playerCU || '—', 550, 362],
+        ['Butterflies Collected', `${collected.size} of 5`, 180, 497],
+        ['Time Left', formatTime(timerSeconds), 550, 497],
+      ];
+      labels.forEach(([label, value, x, y]) => {
+        ctx.fillStyle = '#7a9181';
+        ctx.font = '900 18px Arial';
+        ctx.fillText(label, x, y);
+        ctx.fillStyle = '#1d5c41';
+        ctx.font = '700 28px Arial';
+        wrapText(ctx, value, x, y + 38, 290, 34);
+      });
+
+      ctx.fillStyle = '#215f43';
+      ctx.font = '700 22px Arial';
+      const message = collected.size === 5
+        ? 'All five butterflies found their flowers!'
+        : 'Keep growing your garden through every right pair.';
+      wrapText(ctx, message, 150, 635, 700, 34);
+
+      // Right-side decorative garden
+      drawScoreFlowers(ctx);
+      drawScoreButterflies(ctx);
+
+      ctx.fillStyle = '#5d7c6a';
+      ctx.font = '20px Arial';
+      ctx.fillText('Generated from Game 3 · Collect the Butterflies', 150, 770);
+
+      const link = document.createElement('a');
+      const safeName = (playerName || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'player';
+      link.download = `${safeName}-garden-score.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.95);
+      link.click();
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = String(text).split(' ');
+      let line = '';
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line.trim(), x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line.trim(), x, y);
+    }
+
+    function drawScoreFlowers(ctx) {
+      const stems = [1060, 1140, 1245, 1335, 1430];
+      stems.forEach((x, i) => {
+        const height = [165, 220, 260, 220, 165][i];
+        ctx.strokeStyle = '#457653';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(x, 785);
+        ctx.bezierCurveTo(x - 12, 740, x - 5, 690, x, 785 - height);
+        ctx.stroke();
+
+        ctx.fillStyle = i % 2 ? '#78b881' : '#95ca92';
+        ctx.beginPath(); ctx.moveTo(x, 730 - i * 5); ctx.quadraticCurveTo(x - 34, 695 - i * 5, x - 44, 710 - i * 5); ctx.quadraticCurveTo(x - 20, 736 - i * 5, x, 734 - i * 5); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x, 700 - i * 6); ctx.quadraticCurveTo(x + 36, 675 - i * 6, x + 46, 688 - i * 6); ctx.quadraticCurveTo(x + 18, 716 - i * 6, x, 711 - i * 6); ctx.fill();
+
+        const flowerY = 785 - height;
+        ctx.fillStyle = '#fffef3';
+        ctx.beginPath();
+        ctx.moveTo(x - 12, flowerY + 18);
+        ctx.bezierCurveTo(x - 44, flowerY - 3, x - 42, flowerY - 52, x - 20, flowerY - 66);
+        ctx.bezierCurveTo(x - 10, flowerY - 38, x + 2, flowerY - 28, x + 3, flowerY - 20);
+        ctx.bezierCurveTo(x + 8, flowerY - 52, x + 28, flowerY - 70, x + 34, flowerY - 58);
+        ctx.bezierCurveTo(x + 38, flowerY - 22, x + 22, flowerY + 4, x - 12, flowerY + 18);
+        ctx.fill();
+        ctx.strokeStyle = '#cad8bb';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.strokeStyle = '#e2b447';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(x + 2, flowerY + 4);
+        ctx.quadraticCurveTo(x + 6, flowerY - 20, x + 6, flowerY - 44);
+        ctx.stroke();
+      });
+    }
+
+    function drawScoreButterflies(ctx) {
+      GAME_CONFIG.softSkills.forEach((skill, i) => {
+        const x = 1040 + (i * 95);
+        const y = 210 + (i % 2 ? 55 : 0);
+        drawButterfly(ctx, x, y, skill.color, 0.8);
+      });
+    }
+
+    function drawButterfly(ctx, x, y, color, scale) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.fillStyle = color;
+      ctx.strokeStyle = 'rgba(255,255,255,.7)';
+      ctx.lineWidth = 1.6;
+      const wings = [
+        [[-1,0],[-32,-40],[-60,-15],[-44,8],[-18,8],[-1,3]],
+        [[1,0],[32,-40],[60,-15],[44,8],[18,8],[1,3]],
+        [[-1,6],[-40,2],[-38,40],[-14,38],[-1,12]],
+        [[1,6],[40,2],[38,40],[14,38],[1,12]]
+      ];
+      wings.forEach(points => {
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      });
+      ctx.fillStyle = '#375c4a';
+      ctx.beginPath(); ctx.ellipse(0, 10, 4, 26, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, -4, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#557462'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(-1, -4); ctx.quadraticCurveTo(-10, -18, -14, -16); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(1, -4); ctx.quadraticCurveTo(10, -18, 14, -16); ctx.stroke();
+      ctx.restore();
+    }
+
+    // Events
+    $('player-name').addEventListener('input', validateStartForm);
+    $('player-cu').addEventListener('change', validateStartForm);
+    $('ready-btn').addEventListener('click', startGame);
+    $('submit-btn').addEventListener('click', checkPair);
+    $('next-btn').addEventListener('click', nextRound);
+    $('replay-btn').addEventListener('click', resetGame);
+    $('download-score-btn').addEventListener('click', downloadScorecard);
+
+    // Init
+    renderPlants();
+    renderGroundFlowers();
+    renderButterflies();
+    setTimerUI();
+    updatePlayerUI();
+    updateProgress();
+    validateStartForm();
+  </script>
+</body>
+</html>
